@@ -1,0 +1,11 @@
+@import url('./assets/fontello/css/bluebird.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* background = #1F1F1F */
+
+body {
+  background-color: #737373;
+}

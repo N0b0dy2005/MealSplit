@@ -1,0 +1,91 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type User {
+    id: Int!
+    name: String!
+    email: String!
+    debts: String!
+    credits: String!
+    createDate: String!
+    updatedDate: String!
+    phoneNumber: String!
+}
+type Meal {
+    id : Int!
+    name: String!
+    date: String!
+    totalAmount: String!
+    userId: Int!
+    description: String!
+    createDate: String!
+    updatedDate: String!
+    userIds: String!
+}
+
+
+type response {
+    status: String!
+    message: String!
+    success: Boolean!
+}
+
+
+input MealInput {
+    name: String!
+    date: String!
+    userId: Int!
+    totalAmount: String!
+    userIds: String!
+    description: String!
+}
+input PaymentInput {
+    fromUserId: Int!
+    toUserId: Int!
+    amount: String!
+    description: String!
+}
+type Payment {
+    id: Int!
+    fromUserId: Int!
+    toUserId: Int!
+    amount: String!
+    description: String!
+    date: String!
+
+}
+type Debt {
+    id: Int!
+    fromUserId: Int!
+    toUserId: Int!
+    amount: String!
+    mealsCount: Int!
+    createDate: String!
+    updatedDate: String!
+}
+type Activities {
+    id: Int!
+    type: String!
+    description: String!
+    fromUserId: Int!
+    toUserId: Int!
+    userId: Int!
+    amount: String!
+    date: String!
+}
+type Query {
+    getUsers: [User!]!
+    getMeals: [Meal!]!
+    getPayments: [Payment!]!
+    getDebts: [Debt!]!
+    getActivities: [Activities!]!
+}
+
+type Mutation {
+    createPost(content: String!): response!
+    createUser(name: String!, email: String!): response!
+    createMeal(meal: MealInput!): response!
+    createPayment(payment: PaymentInput!): response!
+}
+
