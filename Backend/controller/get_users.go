@@ -24,7 +24,7 @@ func (d *Service) GetUsers() ([]*model.User, error) {
 
 	var users []User
 	// Verwende Select statt Get, um mehrere Zeilen abzurufen
-	err := d.DB.Select(&users, "SELECT * FROM users")
+	err := d.DB.Select(&users, "SELECT * FROM users ORDER BY name ASC ")
 	if err != nil {
 		log.Println("Error fetching user:", err)
 		return nil, err

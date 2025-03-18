@@ -11,7 +11,7 @@ func (d *Service) GetPayment() ([]*model.Payment, error) {
 
 	var payments []Payment
 	// Verwende Select statt Get, um mehrere Zeilen abzurufen
-	err := d.DB.Select(&payments, "SELECT * FROM payment")
+	err := d.DB.Select(&payments, "SELECT * FROM payment ORDER BY date DESC")
 	if err != nil {
 		log.Println("Error fetching user:", err)
 		return nil, err

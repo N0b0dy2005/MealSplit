@@ -74,12 +74,31 @@ type Activities {
     amount: String!
     date: String!
 }
+
+type TotalCreditsPerUser {
+    userId: Int!
+    amount: String!
+}
+
+type TobDebtsPerUser {
+    userId: Int!
+    amount: String!
+}
+type Dashboard {
+    totalUsers: Int!
+    totalMeals: Int!
+    totalDebts: String!
+    totalCredits: String!
+    tobDebtsPerUser: [TobDebtsPerUser!]!
+    totalCreditsPerUser: [TotalCreditsPerUser!]!
+}
 type Query {
     getUsers: [User!]!
     getMeals: [Meal!]!
     getPayments: [Payment!]!
     getDebts: [Debt!]!
     getActivities: [Activities!]!
+    getDashboard: Dashboard!
 }
 
 type Mutation {

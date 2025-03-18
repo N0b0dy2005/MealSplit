@@ -13,6 +13,15 @@ type Activities struct {
 	Date        string `json:"date"`
 }
 
+type Dashboard struct {
+	TotalUsers          int                    `json:"totalUsers"`
+	TotalMeals          int                    `json:"totalMeals"`
+	TotalDebts          string                 `json:"totalDebts"`
+	TotalCredits        string                 `json:"totalCredits"`
+	TobDebtsPerUser     []*TobDebtsPerUser     `json:"tobDebtsPerUser"`
+	TotalCreditsPerUser []*TotalCreditsPerUser `json:"totalCreditsPerUser"`
+}
+
 type Debt struct {
 	ID          int    `json:"id"`
 	FromUserID  int    `json:"fromUserId"`
@@ -64,6 +73,16 @@ type PaymentInput struct {
 }
 
 type Query struct {
+}
+
+type TobDebtsPerUser struct {
+	UserID int    `json:"userId"`
+	Amount string `json:"amount"`
+}
+
+type TotalCreditsPerUser struct {
+	UserID int    `json:"userId"`
+	Amount string `json:"amount"`
 }
 
 type User struct {

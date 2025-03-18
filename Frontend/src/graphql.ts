@@ -14,6 +14,15 @@ export interface Activities {
 	date: string;
 }
 
+export interface Dashboard {
+	totalUsers: number;
+	totalMeals: number;
+	totalDebts: string;
+	totalCredits: string;
+	tobDebtsPerUser: TobDebtsPerUser[];
+	totalCreditsPerUser: TotalCreditsPerUser[];
+}
+
 export interface Debt {
 	id: number;
 	fromUserId: number;
@@ -59,6 +68,16 @@ export interface PaymentInput {
 	toUserId: number;
 	amount: string;
 	description: string;
+}
+
+export interface TobDebtsPerUser {
+	userId: number;
+	amount: string;
+}
+
+export interface TotalCreditsPerUser {
+	userId: number;
+	amount: string;
 }
 
 export interface User {
@@ -239,6 +258,46 @@ async function getActivities(): Promise<[Activities[] | null, any | null]> {
 	}
 }
 
+async function getDashboard(): Promise<[Dashboard | null, any | null]> {
+	try {
+		const response = await apolloClient.query({
+			query: gql(`
+				 query getDashboard {
+					getDashboard {
+						totalUsers 
+						totalMeals 
+						totalDebts 
+						totalCredits 
+						tobDebtsPerUser {
+							userId 
+							amount 
+						}
+						totalCreditsPerUser {
+							userId 
+							amount 
+						}
+					}
+				}
+				`),
+			variables: {
+				
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.getDashboard) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.getDashboard, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 async function getDebts(): Promise<[Debt[] | null, any | null]> {
 	try {
 		const response = await apolloClient.query({
@@ -383,6 +442,7 @@ async function getUsers(): Promise<[User[] | null, any | null]> {
 
 export const query = {
 	getActivities,
+	getDashboard,
 	getDebts,
 	getMeals,
 	getPayments,

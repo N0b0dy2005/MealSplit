@@ -22,7 +22,7 @@ func (d *Service) GetDebts() ([]*model.Debt, error) {
 
 	var debts []Debt
 	// Verwende Select statt Get, um mehrere Zeilen abzurufen
-	err := d.DB.Select(&debts, "SELECT * FROM debts")
+	err := d.DB.Select(&debts, "SELECT * FROM debts ORDER BY created_at DESC")
 	if err != nil {
 		log.Println("Error fetching user:", err)
 		return nil, err

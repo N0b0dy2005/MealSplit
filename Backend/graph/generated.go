@@ -58,6 +58,15 @@ type ComplexityRoot struct {
 		UserID      func(childComplexity int) int
 	}
 
+	Dashboard struct {
+		TobDebtsPerUser     func(childComplexity int) int
+		TotalCredits        func(childComplexity int) int
+		TotalCreditsPerUser func(childComplexity int) int
+		TotalDebts          func(childComplexity int) int
+		TotalMeals          func(childComplexity int) int
+		TotalUsers          func(childComplexity int) int
+	}
+
 	Debt struct {
 		Amount      func(childComplexity int) int
 		CreateDate  func(childComplexity int) int
@@ -98,10 +107,21 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetActivities func(childComplexity int) int
+		GetDashboard  func(childComplexity int) int
 		GetDebts      func(childComplexity int) int
 		GetMeals      func(childComplexity int) int
 		GetPayments   func(childComplexity int) int
 		GetUsers      func(childComplexity int) int
+	}
+
+	TobDebtsPerUser struct {
+		Amount func(childComplexity int) int
+		UserID func(childComplexity int) int
+	}
+
+	TotalCreditsPerUser struct {
+		Amount func(childComplexity int) int
+		UserID func(childComplexity int) int
 	}
 
 	User struct {
@@ -134,6 +154,7 @@ type QueryResolver interface {
 	GetPayments(ctx context.Context) ([]*model.Payment, error)
 	GetDebts(ctx context.Context) ([]*model.Debt, error)
 	GetActivities(ctx context.Context) ([]*model.Activities, error)
+	GetDashboard(ctx context.Context) (*model.Dashboard, error)
 }
 
 type executableSchema struct {
@@ -210,6 +231,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Activities.UserID(childComplexity), true
+
+	case "Dashboard.tobDebtsPerUser":
+		if e.complexity.Dashboard.TobDebtsPerUser == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TobDebtsPerUser(childComplexity), true
+
+	case "Dashboard.totalCredits":
+		if e.complexity.Dashboard.TotalCredits == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TotalCredits(childComplexity), true
+
+	case "Dashboard.totalCreditsPerUser":
+		if e.complexity.Dashboard.TotalCreditsPerUser == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TotalCreditsPerUser(childComplexity), true
+
+	case "Dashboard.totalDebts":
+		if e.complexity.Dashboard.TotalDebts == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TotalDebts(childComplexity), true
+
+	case "Dashboard.totalMeals":
+		if e.complexity.Dashboard.TotalMeals == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TotalMeals(childComplexity), true
+
+	case "Dashboard.totalUsers":
+		if e.complexity.Dashboard.TotalUsers == nil {
+			break
+		}
+
+		return e.complexity.Dashboard.TotalUsers(childComplexity), true
 
 	case "Debt.amount":
 		if e.complexity.Debt.Amount == nil {
@@ -420,6 +483,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetActivities(childComplexity), true
 
+	case "Query.getDashboard":
+		if e.complexity.Query.GetDashboard == nil {
+			break
+		}
+
+		return e.complexity.Query.GetDashboard(childComplexity), true
+
 	case "Query.getDebts":
 		if e.complexity.Query.GetDebts == nil {
 			break
@@ -447,6 +517,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetUsers(childComplexity), true
+
+	case "TobDebtsPerUser.amount":
+		if e.complexity.TobDebtsPerUser.Amount == nil {
+			break
+		}
+
+		return e.complexity.TobDebtsPerUser.Amount(childComplexity), true
+
+	case "TobDebtsPerUser.userId":
+		if e.complexity.TobDebtsPerUser.UserID == nil {
+			break
+		}
+
+		return e.complexity.TobDebtsPerUser.UserID(childComplexity), true
+
+	case "TotalCreditsPerUser.amount":
+		if e.complexity.TotalCreditsPerUser.Amount == nil {
+			break
+		}
+
+		return e.complexity.TotalCreditsPerUser.Amount(childComplexity), true
+
+	case "TotalCreditsPerUser.userId":
+		if e.complexity.TotalCreditsPerUser.UserID == nil {
+			break
+		}
+
+		return e.complexity.TotalCreditsPerUser.UserID(childComplexity), true
 
 	case "User.createDate":
 		if e.complexity.User.CreateDate == nil {
@@ -1231,6 +1329,282 @@ func (ec *executionContext) fieldContext_Activities_date(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_totalUsers(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_totalUsers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalUsers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_totalUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_totalMeals(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_totalMeals(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalMeals, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_totalMeals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_totalDebts(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_totalDebts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalDebts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_totalDebts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_totalCredits(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_totalCredits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCredits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_totalCredits(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_tobDebtsPerUser(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_tobDebtsPerUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TobDebtsPerUser, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TobDebtsPerUser)
+	fc.Result = res
+	return ec.marshalNTobDebtsPerUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐTobDebtsPerUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_tobDebtsPerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userId":
+				return ec.fieldContext_TobDebtsPerUser_userId(ctx, field)
+			case "amount":
+				return ec.fieldContext_TobDebtsPerUser_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TobDebtsPerUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Dashboard_totalCreditsPerUser(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Dashboard_totalCreditsPerUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCreditsPerUser, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TotalCreditsPerUser)
+	fc.Result = res
+	return ec.marshalNTotalCreditsPerUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐTotalCreditsPerUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Dashboard_totalCreditsPerUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Dashboard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userId":
+				return ec.fieldContext_TotalCreditsPerUser_userId(ctx, field)
+			case "amount":
+				return ec.fieldContext_TotalCreditsPerUser_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TotalCreditsPerUser", field.Name)
 		},
 	}
 	return fc, nil
@@ -2762,6 +3136,64 @@ func (ec *executionContext) fieldContext_Query_getActivities(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getDashboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getDashboard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetDashboard(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Dashboard)
+	fc.Result = res
+	return ec.marshalNDashboard2ᚖmyᚑbackendᚋgraphᚋmodelᚐDashboard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getDashboard(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalUsers":
+				return ec.fieldContext_Dashboard_totalUsers(ctx, field)
+			case "totalMeals":
+				return ec.fieldContext_Dashboard_totalMeals(ctx, field)
+			case "totalDebts":
+				return ec.fieldContext_Dashboard_totalDebts(ctx, field)
+			case "totalCredits":
+				return ec.fieldContext_Dashboard_totalCredits(ctx, field)
+			case "tobDebtsPerUser":
+				return ec.fieldContext_Dashboard_tobDebtsPerUser(ctx, field)
+			case "totalCreditsPerUser":
+				return ec.fieldContext_Dashboard_totalCreditsPerUser(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Dashboard", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -2888,6 +3320,182 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TobDebtsPerUser_userId(ctx context.Context, field graphql.CollectedField, obj *model.TobDebtsPerUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TobDebtsPerUser_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TobDebtsPerUser_userId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TobDebtsPerUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TobDebtsPerUser_amount(ctx context.Context, field graphql.CollectedField, obj *model.TobDebtsPerUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TobDebtsPerUser_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TobDebtsPerUser_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TobDebtsPerUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TotalCreditsPerUser_userId(ctx context.Context, field graphql.CollectedField, obj *model.TotalCreditsPerUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TotalCreditsPerUser_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TotalCreditsPerUser_userId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TotalCreditsPerUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TotalCreditsPerUser_amount(ctx context.Context, field graphql.CollectedField, obj *model.TotalCreditsPerUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TotalCreditsPerUser_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TotalCreditsPerUser_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TotalCreditsPerUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5520,6 +6128,70 @@ func (ec *executionContext) _Activities(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var dashboardImplementors = []string{"Dashboard"}
+
+func (ec *executionContext) _Dashboard(ctx context.Context, sel ast.SelectionSet, obj *model.Dashboard) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dashboardImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Dashboard")
+		case "totalUsers":
+			out.Values[i] = ec._Dashboard_totalUsers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalMeals":
+			out.Values[i] = ec._Dashboard_totalMeals(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalDebts":
+			out.Values[i] = ec._Dashboard_totalDebts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCredits":
+			out.Values[i] = ec._Dashboard_totalCredits(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tobDebtsPerUser":
+			out.Values[i] = ec._Dashboard_tobDebtsPerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCreditsPerUser":
+			out.Values[i] = ec._Dashboard_totalCreditsPerUser(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var debtImplementors = []string{"Debt"}
 
 func (ec *executionContext) _Debt(ctx context.Context, sel ast.SelectionSet, obj *model.Debt) graphql.Marshaler {
@@ -5931,6 +6603,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getDashboard":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getDashboard(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -5939,6 +6633,94 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tobDebtsPerUserImplementors = []string{"TobDebtsPerUser"}
+
+func (ec *executionContext) _TobDebtsPerUser(ctx context.Context, sel ast.SelectionSet, obj *model.TobDebtsPerUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tobDebtsPerUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TobDebtsPerUser")
+		case "userId":
+			out.Values[i] = ec._TobDebtsPerUser_userId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._TobDebtsPerUser_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var totalCreditsPerUserImplementors = []string{"TotalCreditsPerUser"}
+
+func (ec *executionContext) _TotalCreditsPerUser(ctx context.Context, sel ast.SelectionSet, obj *model.TotalCreditsPerUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, totalCreditsPerUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TotalCreditsPerUser")
+		case "userId":
+			out.Values[i] = ec._TotalCreditsPerUser_userId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._TotalCreditsPerUser_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6489,6 +7271,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNDashboard2myᚑbackendᚋgraphᚋmodelᚐDashboard(ctx context.Context, sel ast.SelectionSet, v model.Dashboard) graphql.Marshaler {
+	return ec._Dashboard(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDashboard2ᚖmyᚑbackendᚋgraphᚋmodelᚐDashboard(ctx context.Context, sel ast.SelectionSet, v *model.Dashboard) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Dashboard(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNDebt2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐDebtᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Debt) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -6689,6 +7485,114 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTobDebtsPerUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐTobDebtsPerUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TobDebtsPerUser) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTobDebtsPerUser2ᚖmyᚑbackendᚋgraphᚋmodelᚐTobDebtsPerUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTobDebtsPerUser2ᚖmyᚑbackendᚋgraphᚋmodelᚐTobDebtsPerUser(ctx context.Context, sel ast.SelectionSet, v *model.TobDebtsPerUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TobDebtsPerUser(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTotalCreditsPerUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐTotalCreditsPerUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TotalCreditsPerUser) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTotalCreditsPerUser2ᚖmyᚑbackendᚋgraphᚋmodelᚐTotalCreditsPerUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTotalCreditsPerUser2ᚖmyᚑbackendᚋgraphᚋmodelᚐTotalCreditsPerUser(ctx context.Context, sel ast.SelectionSet, v *model.TotalCreditsPerUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TotalCreditsPerUser(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {

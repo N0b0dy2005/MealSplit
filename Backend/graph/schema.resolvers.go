@@ -54,6 +54,11 @@ func (r *queryResolver) GetActivities(ctx context.Context) ([]*model.Activities,
 	return GetControllerService(ctx).GetActivities()
 }
 
+// GetDashboard is the resolver for the getDashboard field.
+func (r *queryResolver) GetDashboard(ctx context.Context) (*model.Dashboard, error) {
+	return GetControllerService(ctx).GetDashboard()
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

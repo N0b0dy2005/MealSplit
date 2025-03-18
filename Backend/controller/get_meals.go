@@ -23,7 +23,7 @@ func (d *Service) GetMeals() ([]*model.Meal, error) {
 
 	var meals []Meals
 	// Verwende Select statt Get, um mehrere Zeilen abzurufen
-	err := d.DB.Select(&meals, "SELECT * FROM meals")
+	err := d.DB.Select(&meals, "SELECT * FROM meals ORDER BY created_at DESC")
 	if err != nil {
 		log.Println("Error fetching user:", err)
 		return nil, err
