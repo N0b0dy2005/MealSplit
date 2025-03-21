@@ -7,7 +7,14 @@ package graph
 import (
 	"context"
 	"my-backend/graph/model"
+
+	"github.com/99designs/gqlgen/graphql"
 )
+
+// UploadReceipt is the resolver for the uploadReceipt field.
+func (r *mutationResolver) UploadReceipt(ctx context.Context, file graphql.Upload) (*model.ReceiptResult, error) {
+	return GetControllerService(ctx).UploadReceipt(file)
+}
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, content string) (*model.Response, error) {

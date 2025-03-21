@@ -94,6 +94,7 @@ type ComplexityRoot struct {
 		CreatePayment func(childComplexity int, payment model.PaymentInput) int
 		CreatePost    func(childComplexity int, content string) int
 		CreateUser    func(childComplexity int, name string, email string) int
+		UploadReceipt func(childComplexity int, file graphql.Upload) int
 	}
 
 	Payment struct {
@@ -112,6 +113,16 @@ type ComplexityRoot struct {
 		GetMeals      func(childComplexity int) int
 		GetPayments   func(childComplexity int) int
 		GetUsers      func(childComplexity int) int
+	}
+
+	ReceiptItem struct {
+		Name  func(childComplexity int) int
+		Price func(childComplexity int) int
+	}
+
+	ReceiptResult struct {
+		Items func(childComplexity int) int
+		Total func(childComplexity int) int
 	}
 
 	TobDebtsPerUser struct {
@@ -143,6 +154,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
+	UploadReceipt(ctx context.Context, file graphql.Upload) (*model.ReceiptResult, error)
 	CreatePost(ctx context.Context, content string) (*model.Response, error)
 	CreateUser(ctx context.Context, name string, email string) (*model.Response, error)
 	CreateMeal(ctx context.Context, meal model.MealInput) (*model.Response, error)
@@ -434,6 +446,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["name"].(string), args["email"].(string)), true
 
+	case "Mutation.uploadReceipt":
+		if e.complexity.Mutation.UploadReceipt == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadReceipt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadReceipt(childComplexity, args["file"].(graphql.Upload)), true
+
 	case "Payment.amount":
 		if e.complexity.Payment.Amount == nil {
 			break
@@ -517,6 +541,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetUsers(childComplexity), true
+
+	case "ReceiptItem.name":
+		if e.complexity.ReceiptItem.Name == nil {
+			break
+		}
+
+		return e.complexity.ReceiptItem.Name(childComplexity), true
+
+	case "ReceiptItem.price":
+		if e.complexity.ReceiptItem.Price == nil {
+			break
+		}
+
+		return e.complexity.ReceiptItem.Price(childComplexity), true
+
+	case "ReceiptResult.items":
+		if e.complexity.ReceiptResult.Items == nil {
+			break
+		}
+
+		return e.complexity.ReceiptResult.Items(childComplexity), true
+
+	case "ReceiptResult.total":
+		if e.complexity.ReceiptResult.Total == nil {
+			break
+		}
+
+		return e.complexity.ReceiptResult.Total(childComplexity), true
 
 	case "TobDebtsPerUser.amount":
 		if e.complexity.TobDebtsPerUser.Amount == nil {
@@ -856,6 +908,29 @@ func (ec *executionContext) field_Mutation_createUser_argsEmail(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadReceipt_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadReceipt_argsFile(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["file"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_uploadReceipt_argsFile(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+	if tmp, ok := rawArgs["file"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
 	return zeroVal, nil
 }
 
@@ -2314,6 +2389,67 @@ func (ec *executionContext) fieldContext_Meal_userIds(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_uploadReceipt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadReceipt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadReceipt(rctx, fc.Args["file"].(graphql.Upload))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReceiptResult)
+	fc.Result = res
+	return ec.marshalNReceiptResult2ᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadReceipt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_ReceiptResult_items(ctx, field)
+			case "total":
+				return ec.fieldContext_ReceiptResult_total(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ReceiptResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadReceipt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createPost(ctx, field)
 	if err != nil {
@@ -3320,6 +3456,188 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReceiptItem_name(ctx context.Context, field graphql.CollectedField, obj *model.ReceiptItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReceiptItem_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReceiptItem_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReceiptItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReceiptItem_price(ctx context.Context, field graphql.CollectedField, obj *model.ReceiptItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReceiptItem_price(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReceiptItem_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReceiptItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReceiptResult_items(ctx context.Context, field graphql.CollectedField, obj *model.ReceiptResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReceiptResult_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ReceiptItem)
+	fc.Result = res
+	return ec.marshalNReceiptItem2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReceiptResult_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReceiptResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_ReceiptItem_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ReceiptItem_price(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ReceiptItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ReceiptResult_total(ctx context.Context, field graphql.CollectedField, obj *model.ReceiptResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ReceiptResult_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ReceiptResult_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ReceiptResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6359,6 +6677,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "uploadReceipt":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_uploadReceipt(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createPost":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createPost(ctx, field)
@@ -6633,6 +6958,94 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var receiptItemImplementors = []string{"ReceiptItem"}
+
+func (ec *executionContext) _ReceiptItem(ctx context.Context, sel ast.SelectionSet, obj *model.ReceiptItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, receiptItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ReceiptItem")
+		case "name":
+			out.Values[i] = ec._ReceiptItem_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "price":
+			out.Values[i] = ec._ReceiptItem_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var receiptResultImplementors = []string{"ReceiptResult"}
+
+func (ec *executionContext) _ReceiptResult(ctx context.Context, sel ast.SelectionSet, obj *model.ReceiptResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, receiptResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ReceiptResult")
+		case "items":
+			out.Values[i] = ec._ReceiptResult_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._ReceiptResult_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7339,6 +7752,21 @@ func (ec *executionContext) marshalNDebt2ᚖmyᚑbackendᚋgraphᚋmodelᚐDebt(
 	return ec._Debt(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7472,6 +7900,74 @@ func (ec *executionContext) unmarshalNPaymentInput2myᚑbackendᚋgraphᚋmodel�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNReceiptItem2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ReceiptItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNReceiptItem2ᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNReceiptItem2ᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptItem(ctx context.Context, sel ast.SelectionSet, v *model.ReceiptItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ReceiptItem(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNReceiptResult2myᚑbackendᚋgraphᚋmodelᚐReceiptResult(ctx context.Context, sel ast.SelectionSet, v model.ReceiptResult) graphql.Marshaler {
+	return ec._ReceiptResult(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNReceiptResult2ᚖmyᚑbackendᚋgraphᚋmodelᚐReceiptResult(ctx context.Context, sel ast.SelectionSet, v *model.ReceiptResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ReceiptResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7593,6 +8089,21 @@ func (ec *executionContext) marshalNTotalCreditsPerUser2ᚖmyᚑbackendᚋgraph�
 		return graphql.Null
 	}
 	return ec._TotalCreditsPerUser(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	res := graphql.MarshalUpload(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNUser2ᚕᚖmyᚑbackendᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {

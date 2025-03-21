@@ -1,6 +1,7 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar Upload
 
 type User {
     id: Int!
@@ -74,6 +75,16 @@ type Activities {
     amount: String!
     date: String!
 }
+type ReceiptItem {
+    name: String!
+    price: Float!
+}
+
+type ReceiptResult {
+    items: [ReceiptItem!]!
+    total: Float!
+}
+
 
 type TotalCreditsPerUser {
     userId: Int!
@@ -102,6 +113,7 @@ type Query {
 }
 
 type Mutation {
+    uploadReceipt(file: Upload!): ReceiptResult!
     createPost(content: String!): response!
     createUser(name: String!, email: String!): response!
     createMeal(meal: MealInput!): response!

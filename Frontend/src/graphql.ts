@@ -70,6 +70,16 @@ export interface PaymentInput {
 	description: string;
 }
 
+export interface ReceiptItem {
+	name: string;
+	price: number;
+}
+
+export interface ReceiptResult {
+	items: ReceiptItem[];
+	total: number;
+}
+
 export interface TobDebtsPerUser {
 	userId: number;
 	amount: string;
@@ -78,6 +88,9 @@ export interface TobDebtsPerUser {
 export interface TotalCreditsPerUser {
 	userId: number;
 	amount: string;
+}
+
+export interface Upload {
 }
 
 export interface User {
@@ -440,6 +453,39 @@ async function getUsers(): Promise<[User[] | null, any | null]> {
 	}
 }
 
+async function uploadReceipt(file: Upload): Promise<[ReceiptResult | null, any | null]> {
+	try {
+		const response = await apolloClient.mutate({
+			mutation: gql(`
+				 mutation uploadReceipt($file: Upload!) {
+					uploadReceipt(file: $file) {
+						items {
+							name 
+							price 
+						}
+						total 
+					}
+				}
+				`),
+			variables: {
+								file: file
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.uploadReceipt) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.uploadReceipt, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 export const query = {
 	getActivities,
 	getDashboard,
@@ -452,7 +498,8 @@ export const mutation = {
 	createMeal,
 	createPayment,
 	createPost,
-	createUser
+	createUser,
+	uploadReceipt
 };
 
 

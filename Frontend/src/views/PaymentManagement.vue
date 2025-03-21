@@ -368,7 +368,7 @@
         </div>
 
         <div v-else class="text-center py-6 text-meal-gray">
-          Keine offenen Schulden vorhanden. Super!
+          Keine offenen Beträge vorhanden. Super!
         </div>
       </div>
     </div>
@@ -415,7 +415,7 @@ async function getDebts() {
   debts.value = data;
 }
 
-// Schulden zwischen Benutzern berechnen
+// Beträge zwischen Benutzern berechnen
 const debts = ref([]);
 
 // Methoden

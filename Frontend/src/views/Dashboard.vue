@@ -85,7 +85,7 @@
 
         <div class="bg-white rounded-xl shadow-meal p-3 sm:p-6">
           <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Offene Schulden</h3>
+            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Offene Beträge</h3>
             <div class="p-1 sm:p-2 bg-meal-light rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-meal-error" fill="none" viewBox="0 0 24 24"
                    stroke="currentColor">
@@ -97,7 +97,7 @@
           <p class="text-xl sm:text-3xl font-bold text-meal-gray-dark mb-1">{{ formatCurrency(stats.totalDebt) }}</p>
           <div class="flex items-center text-xs sm:text-sm">
             <span class="text-meal-error font-medium">{{ stats.activeDebts }}</span>
-            <span class="text-meal-gray ml-1">aktive Schulden</span>
+            <span class="text-meal-gray ml-1">aktive Beträge</span>
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@
         </div>
       </div>
 
-      <!-- Aktuelle Aktivitäten und Schulden -->
+      <!-- Aktuelle Aktivitäten und Beträge -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-8">
         <!-- Letzte Aktivitäten -->
         <div class="bg-white h-[350px] sm:h-[550px] flex flex-col overflow-auto rounded-xl shadow-meal p-4 sm:p-6 lg:col-span-2">
@@ -225,9 +225,9 @@
           </button>
         </div>
 
-        <!-- Top Schulden -->
+        <!-- Top Beträge -->
         <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-3 sm:mb-4">Top Schulden</h3>
+          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-3 sm:mb-4">Top Beträge</h3>
 
           <div class="space-y-3 sm:space-y-4">
             <div v-for="(debt, index) in topDebts" :key="index"
@@ -251,7 +251,7 @@
 
           <button @click="goToDebts"
                   class="w-full mt-3 sm:mt-4 py-2 text-meal-primary hover:text-meal-dark text-sm sm:text-base font-medium transition-colors duration-200">
-            Alle Schulden anzeigen
+            Alle Beträge anzeigen
           </button>
         </div>
       </div>
@@ -414,7 +414,7 @@ async function getActivities() {
   }
 }
 
-// Top Schulden
+// Top Beträge
 
 
 // Berechnung für das Kreisdiagramm

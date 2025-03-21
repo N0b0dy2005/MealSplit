@@ -75,6 +75,16 @@ type PaymentInput struct {
 type Query struct {
 }
 
+type ReceiptItem struct {
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
+}
+
+type ReceiptResult struct {
+	Items []*ReceiptItem `json:"items"`
+	Total float64        `json:"total"`
+}
+
 type TobDebtsPerUser struct {
 	UserID int    `json:"userId"`
 	Amount string `json:"amount"`

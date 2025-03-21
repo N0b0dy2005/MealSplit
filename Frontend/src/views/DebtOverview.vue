@@ -9,10 +9,10 @@
           </svg>
           <h1 class="text-xl sm:text-2xl font-header font-bold">
             <span class="hidden sm:inline">Schuldenübersicht</span>
-            <span class="sm:hidden">Schulden</span>
+            <span class="sm:hidden">Beträge</span>
           </h1>
         </div>
-        <button @click="goBackToHomeScreen" class="text-white hover:text-meal-accent-light transition-colors duration-200">
+        <button @click="goBackToHomeScreen" class="text-white  hover:text-meal-accent-light transition-colors duration-200">
           <span class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -28,9 +28,9 @@
       <!-- Zusammenfassung -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Offene Schulden</h3>
+          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Offene Beträge</h3>
           <p class="text-2xl sm:text-3xl font-bold text-meal-error">{{ formatCurrency(totalDebt) }}</p>
-          <p class="text-xs sm:text-sm text-meal-gray mt-1">Summe aller ausstehenden Schulden</p>
+          <p class="text-xs sm:text-sm text-meal-gray mt-1">Summe aller ausstehenden Beträge</p>
         </div>
 
         <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
@@ -64,7 +64,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
               </svg>
-              <span class="hidden sm:inline">Schulden Liste</span>
+              <span class="hidden sm:inline">Beträge Liste</span>
             </span>
           </button>
           <button
@@ -80,7 +80,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
-              <span class="hidden sm:inline">Schulden Matrix</span>
+              <span class="hidden sm:inline">Beträge Matrix</span>
             </span>
           </button>
           <button
@@ -101,14 +101,14 @@
           </button>
         </div>
 
-        <!-- Schulden Liste Ansicht -->
+        <!-- Beträge Liste Ansicht -->
         <div v-if="activeTab === 'list'" class="p-4 sm:p-6">
           <div v-if="debts.length === 0" class="text-center py-6 sm:py-8 text-meal-gray">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-meal-gray-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="text-lg sm:text-xl mb-2">Keine offenen Schulden</p>
-            <p>Alle Schulden sind bezahlt. Gut gemacht!</p>
+            <p class="text-lg sm:text-xl mb-2">Keine offenen Beträge</p>
+            <p>Alle Beträge sind bezahlt. Gut gemacht!</p>
           </div>
 
           <div v-else>
@@ -230,7 +230,7 @@
           </div>
         </div>
 
-        <!-- Schulden Matrix Ansicht -->
+        <!-- Beträge Matrix Ansicht -->
         <div v-if="activeTab === 'matrix'" class="p-4 sm:p-6">
           <!-- Matrix View (Desktop only) -->
           <div class="hidden sm:block overflow-x-auto">
@@ -312,9 +312,9 @@
             </div>
 
             <div class="mt-4 pt-4 border-t border-meal-gray-light">
-              <h4 class="font-bold text-meal-gray-dark mb-2">Aktuelle Schulden</h4>
+              <h4 class="font-bold text-meal-gray-dark mb-2">Aktuelle Beträge</h4>
               <div v-if="debts.length === 0" class="text-center py-3 text-meal-gray">
-                Keine offenen Schulden vorhanden.
+                Keine offenen Beträge vorhanden.
               </div>
               <div v-else class="space-y-2">
                 <div v-for="(debt, index) in debts" :key="index"
@@ -366,7 +366,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p class="text-lg sm:text-xl mb-2">Keine Zahlungen notwendig</p>
-            <p>Alle Schulden sind bereits ausgeglichen.</p>
+            <p>Alle Beträge sind bereits ausgeglichen.</p>
           </div>
 
           <div v-else class="space-y-4 sm:space-y-6">
@@ -441,7 +441,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                     </svg>
-                    <span>Diese Zahlung löst {{ payment.resolvesCount }} Schulden gleichzeitig</span>
+                    <span>Diese Zahlung löst {{ payment.resolvesCount }} Beträge gleichzeitig</span>
                   </div>
                 </div>
               </div>
@@ -525,7 +525,7 @@ import {create, get} from "axios";
 // Beispiel-Benutzer
 const users = ref([]);
 
-// Beispiel-Schulden (in der Realität berechnet aus Mahlzeiten und Zahlungen)
+// Beispiel-Beträge (in der Realität berechnet aus Mahlzeiten und Zahlungen)
 const debts = ref([]);
 
 // Beispiel-Zahlungshistorie
@@ -625,7 +625,7 @@ const optimizedPayments = computed(() => {
     return [];
   }
 
-  // Gruppiere Schulden nach Schuldner-Gläubiger-Paar
+  // Gruppiere Beträge nach Schuldner-Gläubiger-Paar
   const groupedDebts = {};
 
   debts.value.forEach(debt => {
@@ -704,7 +704,7 @@ function markOptimizedAsPaid(index) {
     date: new Date().toISOString().split('T')[0]
   });
 
-  // Aktualisiere Schulden - in Realität würde man hier alle betroffenen Schulden aktualisieren
+  // Aktualisiere Beträge - in Realität würde man hier alle betroffenen Beträge aktualisieren
   // Diese einfache Implementierung entfernt einfach die erste passende Schuld
   const debtIndex = debts.value.findIndex(
       debt => debt.fromUserId === payment.fromUserId && debt.toUserId === payment.toUserId
@@ -728,7 +728,7 @@ function getDebtAmount(fromId, toId) {
 function getUserBalance(userId) {
   let balance = 0;
 
-  // Schulden (negativ)
+  // Beträge (negativ)
   debts.value.forEach(debt => {
     if (debt.fromUserId === userId) {
       balance -= debt.amount;

@@ -50,7 +50,7 @@
             <tr class="bg-meal-light text-meal-dark text-left">
               <th class="py-3 px-4 rounded-tl-lg">Name</th>
               <th class="py-3 px-4">Email</th>
-              <th class="py-3 px-4">Offene Schulden</th>
+              <th class="py-3 px-4">Offene Beträge</th>
               <th class="py-3 px-4">Ausstehende Zahlungen</th>
               <th class="py-3 px-4 rounded-tr-lg text-right">Aktionen</th>
             </tr>
@@ -155,7 +155,7 @@
               </div>
               <div class="grid grid-cols-2 gap-3 mt-2">
                 <div class="bg-meal-gray-light rounded-lg p-3">
-                  <p class="text-xs text-meal-gray mb-1">Offene Schulden</p>
+                  <p class="text-xs text-meal-gray mb-1">Offene Beträge</p>
                   <p class="font-bold text-sm"
                      :class="{'text-meal-gray-dark': user.debts < 0, 'text-meal-error': user.debts > 0}">
                     {{ formatCurrency(user.debts) }}
@@ -182,7 +182,7 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Offene Schulden</h3>
+          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Offene Beträge</h3>
           <p class="text-2xl sm:text-3xl font-bold text-meal-error">{{ formatCurrency(totalDebts) }}</p>
         </div>
 

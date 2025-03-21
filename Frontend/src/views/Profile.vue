@@ -379,7 +379,7 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-meal p-6">
-          <h3 class="text-lg font-header font-bold text-meal-gray-dark mb-2">Offene Schulden</h3>
+          <h3 class="text-lg font-header font-bold text-meal-gray-dark mb-2">Offene Beträge</h3>
           <p class="text-3xl font-bold" :class="statistics.totalDebt < 0 ? 'text-meal-error' : 'text-meal-positive'">
             {{ formatCurrency(statistics.totalDebt) }}
           </p>

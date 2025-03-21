@@ -29,7 +29,7 @@
             <li><p @click="goToDashboard" class="hover:text-meal-accent-light transition-colors duration-200">Dashboard</p></li>
             <li><p @click="goToMeal" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Mahlzeiten</p></li>
             <li><p @click="goToPayments" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Zahlungen</p></li>
-            <li><p @click="goToDebts" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Schulden</p></li>
+            <li><p @click="goToDebts" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Beträge</p></li>
             <li><p @click="goToProfile" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Profile</p></li>
           </ul>
         </nav>
@@ -45,7 +45,7 @@
           <li><p @click="navigateMobile(goToDashboard)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Dashboard</p></li>
           <li><p @click="navigateMobile(goToMeal)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Mahlzeiten</p></li>
           <li><p @click="navigateMobile(goToPayments)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Zahlungen</p></li>
-          <li><p @click="navigateMobile(goToDebts)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Schulden</p></li>
+          <li><p @click="navigateMobile(goToDebts)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Beträge</p></li>
           <li><p @click="navigateMobile(goToProfile)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Profile</p></li>
         </ul>
       </div>
@@ -127,9 +127,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 class="text-lg sm:text-xl font-header font-bold text-meal-gray-dark mb-2">3. Schulden im Überblick</h3>
+            <h3 class="text-lg sm:text-xl font-header font-bold text-meal-gray-dark mb-2">3. Beträge im Überblick</h3>
             <p class="text-meal-gray text-sm sm:text-base">
-              Alle Schulden werden automatisch berechnet. Sehe auf einen Blick, wer wem wie viel schuldet.
+              Alle Beträge werden automatisch berechnet. Sehe auf einen Blick, wer wem wie viel schuldet.
             </p>
             <button @click="goToDebts"
                     class="mt-4 w-full bg-meal-light hover:bg-meal-primary hover:text-white text-meal-primary font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm sm:text-base"
@@ -189,7 +189,7 @@
                   </div>
                 </div>
                 <div class="ml-6">
-                  <h3 class="text-lg font-header font-bold text-meal-primary mb-1">Schulden anzeigen</h3>
+                  <h3 class="text-lg font-header font-bold text-meal-primary mb-1">Beträge anzeigen</h3>
                   <p class="text-meal-gray-dark text-sm sm:text-base">
                     MealSplit berechnet automatisch, wer wem wie viel Geld schuldet, basierend auf allen erfassten Mahlzeiten.
                   </p>
@@ -206,7 +206,7 @@
                 <div class="ml-6">
                   <h3 class="text-lg font-header font-bold text-meal-primary mb-1">Zahlungen erfassen</h3>
                   <p class="text-meal-gray-dark text-sm sm:text-base">
-                    Wenn jemand seine Schulden begleicht, erfasse die Zahlung, und die Schuldenübersicht wird automatisch aktualisiert.
+                    Wenn jemand seine Beträge begleicht, erfasse die Zahlung, und die Schuldenübersicht wird automatisch aktualisiert.
                   </p>
                 </div>
               </div>
@@ -248,7 +248,7 @@
               <!-- Step 3 -->
               <div class="relative flex flex-row mb-12">
                 <div class="flex-1 text-right pr-8">
-                  <h3 class="text-xl font-header font-bold text-meal-primary mb-2">Schulden anzeigen</h3>
+                  <h3 class="text-xl font-header font-bold text-meal-primary mb-2">Beträge anzeigen</h3>
                   <p class="text-meal-gray-dark">
                     MealSplit berechnet automatisch, wer wem wie viel Geld schuldet, basierend auf allen erfassten Mahlzeiten.
                   </p>
@@ -264,7 +264,7 @@
                 <div class="flex-1 text-left pl-8">
                   <h3 class="text-xl font-header font-bold text-meal-primary mb-2">Zahlungen erfassen</h3>
                   <p class="text-meal-gray-dark">
-                    Wenn jemand seine Schulden begleicht, erfasse die Zahlung, und die Schuldenübersicht wird automatisch aktualisiert.
+                    Wenn jemand seine Beträge begleicht, erfasse die Zahlung, und die Schuldenübersicht wird automatisch aktualisiert.
                   </p>
                 </div>
                 <div class="absolute left-1/2 transform -translate-x-1/2 bg-meal-primary text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl z-10">
