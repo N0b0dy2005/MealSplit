@@ -1,30 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col flex-grow bg-meal-light font-sans pb-8">
-    <!-- Header -->
-    <header class="bg-meal-primary text-white p-4 shadow-md mb-4 sm:mb-8">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-          </svg>
-          <h1 class="text-xl sm:text-2xl font-header font-bold">Zahlungen</h1>
-        </div>
-        <button @click="goBackToHomeScreen"
-                class="text-white hover:text-meal-accent-light transition-colors duration-200">
-          <span class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-            <span class="hidden sm:inline">Zurück zur Startseite</span>
-            <span class="sm:hidden">Zurück</span>
-          </span>
-        </button>
-      </div>
-    </header>
-
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 mt-4 sm:mt-8">
       <!-- Neue Zahlung erstellen -->
       <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 class="text-xl sm:text-2xl font-header font-bold text-meal-gray-dark mb-4 sm:mb-6">Zahlung erfassen</h2>

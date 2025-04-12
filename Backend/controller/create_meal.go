@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"database/sql"
+	"encoding/json"
 	"log"
 	"my-backend/graph/model"
 	"my-backend/utils/cast"
@@ -9,16 +9,6 @@ import (
 	"strings"
 	"time"
 )
-
-type Debts struct {
-	ID         int     `db:"id"`
-	FromUserID int     `db:"from_user_id"`
-	ToUserID   int     `db:"to_user_id"`
-	Amount     float64 `db:"amount"`
-	MealCount  int     `db:"meals_count"`
-	CreatedAt  string  `db:"created_at"`
-	UpdatedAt  string  `db:"updated_at"`
-}
 
 func (d *Service) CreateMeal(meal model.MealInput) (*model.Response, error) {
 	response := &model.Response{
@@ -37,13 +27,20 @@ func (d *Service) CreateMeal(meal model.MealInput) (*model.Response, error) {
 		return response, err
 	}
 
-	// Insert meal record
-	_, err = d.DB.Exec(
-		`INSERT INTO meals(name,date,total_amount,user_id,description,created_at,updated_at,user_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		meal.Name, meal.Date, meal.TotalAmount, meal.UserID, meal.Description, createDate, createDate, meal.UserIds)
+	// Insert meal record mit Produkten
+	result, err := d.DB.Exec(
+		`INSERT INTO meals(name,date,total_amount,user_id,description,created_at,updated_at,user_ids,products) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		meal.Name, meal.Date, meal.TotalAmount, meal.UserID, meal.Description, createDate, createDate, meal.UserIds, meal.Produkts)
 
 	if err != nil {
 		log.Println("Error creating meal:", err)
+		return response, err
+	}
+
+	// Get the newly created meal ID
+	mealID, err := result.LastInsertId()
+	if err != nil {
+		log.Println("Error getting meal ID:", err)
 		return response, err
 	}
 
@@ -54,9 +51,47 @@ func (d *Service) CreateMeal(meal model.MealInput) (*model.Response, error) {
 		return response, err
 	}
 
-	// Calculate per-person share
+	// Verarbeite die Produkte, wenn vorhanden
+	specificCosts := make(map[int]float64)
+	totalSpecificCosts := 0.0
+
+	if meal.Produkts != "" {
+		var products []Product
+		err = json.Unmarshal([]byte(meal.Produkts), &products)
+		if err != nil {
+			log.Println("Error parsing products:", err)
+			return response, err
+		}
+
+		// Berechne spezifische Kosten pro Benutzer
+		for _, product := range products {
+			if product.IsSpecific && len(product.SpecificParticipants) > 0 {
+				// Teile den Preis durch die Anzahl der spezifischen Teilnehmer
+				pricePerParticipant := product.Price / float64(len(product.SpecificParticipants))
+				totalSpecificCosts += product.Price
+
+				for _, userId := range product.SpecificParticipants {
+					specificCosts[userId] += pricePerParticipant
+				}
+			}
+		}
+	}
+
+	// Berechne den zu teilenden Betrag (Gesamtbetrag - spezifische Kosten)
 	totalAmount := cast.ToFloat64(meal.TotalAmount)
-	perPersonAmount := totalAmount / float64(len(userIds))
+	sharedAmount := totalAmount - totalSpecificCosts
+
+	// Erstelle eine Liste der Benutzer, die am geteilten Betrag teilnehmen
+	sharedUsers := make(map[int]bool)
+	for _, userId := range userIds {
+		sharedUsers[userId] = true
+	}
+
+	// Berechne den Anteil pro Person für den zu teilenden Betrag
+	perPersonSharedAmount := 0.0
+	if len(sharedUsers) > 0 {
+		perPersonSharedAmount = sharedAmount / float64(len(sharedUsers))
+	}
 
 	// Halte eine Liste der Benutzer, die aktualisiert werden müssen
 	usersToUpdate := make(map[int]bool)
@@ -72,100 +107,19 @@ func (d *Service) CreateMeal(meal model.MealInput) (*model.Response, error) {
 		// Füge den Benutzer zur Liste der zu aktualisierenden Benutzer hinzu
 		usersToUpdate[userId] = true
 
-		// Check for existing debt FROM userId TO meal.UserID
-		var debtFromUserToPayer Debts
-		err = d.DB.Get(&debtFromUserToPayer,
-			"SELECT * FROM debts WHERE from_user_id = ? AND to_user_id = ?",
-			userId, meal.UserID)
+		// Berechne Gesamtbetrag für diesen Benutzer (geteilter Betrag + spezifische Kosten)
+		userTotalAmount := perPersonSharedAmount + specificCosts[userId]
 
-		// Check for error but don't exit if it's just "no rows"
-		hasDebtFromUserToPayer := true
+		// Statt zu prüfen, ob Schulden existieren und zu aktualisieren,
+		// erstellen wir immer einen neuen Eintrag für diese Mahlzeit
+		_, err = d.DB.Exec(
+			`INSERT INTO debts(from_user_id, to_user_id, amount, meals_count, created_at, updated_at, meal_id) 
+				VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			userId, meal.UserID, userTotalAmount, 1, createDate, createDate, mealID)
+
 		if err != nil {
-			if err == sql.ErrNoRows {
-				hasDebtFromUserToPayer = false
-			} else {
-				log.Println("Database error checking debts:", err)
-				return response, err
-			}
-		}
-
-		// Check for existing debt FROM meal.UserID TO userId (reverse)
-		var debtFromPayerToUser Debts
-		err = d.DB.Get(&debtFromPayerToUser,
-			"SELECT * FROM debts WHERE from_user_id = ? AND to_user_id = ?",
-			meal.UserID, userId)
-
-		// Check for error but don't exit if it's just "no rows"
-		hasDebtFromPayerToUser := true
-		if err != nil {
-			if err == sql.ErrNoRows {
-				hasDebtFromPayerToUser = false
-			} else {
-				log.Println("Database error checking reverse debts:", err)
-				return response, err
-			}
-		}
-
-		// Process debts based on what exists
-		if hasDebtFromUserToPayer {
-			// User already owes the payer - increase the debt
-			newAmount := debtFromUserToPayer.Amount + perPersonAmount
-			newMealCount := debtFromUserToPayer.MealCount + 1
-
-			_, err = d.DB.Exec(
-				`UPDATE debts SET amount = ?, meals_count = ?, updated_at = ? WHERE id = ?`,
-				newAmount, newMealCount, createDate, debtFromUserToPayer.ID)
-
-			if err != nil {
-				log.Println("Error updating existing debt:", err)
-				return response, err
-			}
-		} else if hasDebtFromPayerToUser {
-			// Payer owes the user - reduce or reverse this debt
-			existingAmount := debtFromPayerToUser.Amount
-
-			if existingAmount > perPersonAmount {
-				// Just reduce the debt
-				newAmount := existingAmount - perPersonAmount
-				_, err = d.DB.Exec(
-					`UPDATE debts SET amount = ?, updated_at = ? WHERE id = ?`,
-					newAmount, createDate, debtFromPayerToUser.ID)
-			} else if existingAmount < perPersonAmount {
-				// Reverse the debt direction
-				newAmount := perPersonAmount - existingAmount
-
-				// Delete the old debt record
-				_, err = d.DB.Exec(`DELETE FROM debts WHERE id = ?`, debtFromPayerToUser.ID)
-				if err != nil {
-					log.Println("Error deleting old debt:", err)
-					return response, err
-				}
-
-				// Create new debt in opposite direction
-				_, err = d.DB.Exec(
-					`INSERT INTO debts(from_user_id, to_user_id, amount, meals_count, created_at, updated_at) 
-					 VALUES (?, ?, ?, ?, ?, ?)`,
-					userId, meal.UserID, newAmount, 1, createDate, createDate)
-			} else {
-				// Debts cancel out exactly - delete the record
-				_, err = d.DB.Exec(`DELETE FROM debts WHERE id = ?`, debtFromPayerToUser.ID)
-			}
-
-			if err != nil {
-				log.Println("Error processing debt update:", err)
-				return response, err
-			}
-		} else {
-			// No existing debt in either direction - create new debt
-			_, err = d.DB.Exec(
-				`INSERT INTO debts(from_user_id, to_user_id, amount, meals_count, created_at, updated_at) 
-				 VALUES (?, ?, ?, ?, ?, ?)`,
-				userId, meal.UserID, perPersonAmount, 1, createDate, createDate)
-
-			if err != nil {
-				log.Println("Error creating new debt:", err)
-				return response, err
-			}
+			log.Println("Error creating new debt:", err)
+			return response, err
 		}
 	}
 
@@ -182,7 +136,7 @@ func (d *Service) CreateMeal(meal model.MealInput) (*model.Response, error) {
 	return response, nil
 }
 
-// Neue Funktion zur Aktualisierung der Benutzer-Schulden und Guthaben
+// Funktion zur Aktualisierung der Benutzer-Schulden und Guthaben
 func (d *Service) UpdateUserDebtsAndCredits(userId int) error {
 	// Berechne Gesamtschulden (was der Benutzer anderen schuldet)
 	var totalDebts float64

@@ -1,56 +1,5 @@
 <template>
   <div class="min-h-screen flex-grow flex flex-col bg-meal-light font-sans">
-    <!-- Header -->
-    <header class="bg-meal-primary text-white p-4 shadow-md">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <h1 class="text-xl sm:text-2xl font-header font-bold">MealSplit</h1>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <button
-            @click="toggleMobileMenu"
-            class="block md:hidden text-white focus:outline-none"
-            aria-label="Menu"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:block">
-          <ul class="flex space-x-6">
-            <li><p @click="goToUser" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Benutzer</p></li>
-            <li><p @click="goToDashboard" class="hover:text-meal-accent-light transition-colors duration-200">Dashboard</p></li>
-            <li><p @click="goToMeal" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Mahlzeiten</p></li>
-            <li><p @click="goToPayments" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Zahlungen</p></li>
-            <li><p @click="goToDebts" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Beträge</p></li>
-            <li><p @click="goToProfile" class="hover:text-meal-accent-light transition-colors duration-200 cursor-pointer">Profile</p></li>
-          </ul>
-        </nav>
-      </div>
-
-      <!-- Mobile Navigation Menu -->
-      <div
-          v-if="mobileMenuOpen"
-          class="md:hidden pt-4 pb-2 px-2 transition-all duration-300 ease-in-out"
-      >
-        <ul class="space-y-2">
-          <li><p @click="navigateMobile(goToUser)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Benutzer</p></li>
-          <li><p @click="navigateMobile(goToDashboard)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Dashboard</p></li>
-          <li><p @click="navigateMobile(goToMeal)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Mahlzeiten</p></li>
-          <li><p @click="navigateMobile(goToPayments)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Zahlungen</p></li>
-          <li><p @click="navigateMobile(goToDebts)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Beträge</p></li>
-          <li><p @click="navigateMobile(goToProfile)" class="block py-2 px-3 rounded hover:bg-meal-dark transition-colors duration-200 cursor-pointer text-center">Profile</p></li>
-        </ul>
-      </div>
-    </header>
-
     <main class="flex-grow">
       <!-- Hero Section -->
       <section class="bg-gradient-to-br from-meal-primary to-meal-dark text-white py-10 sm:py-12 md:py-20">
@@ -329,7 +278,6 @@ import router from "../router";
 const meals = ref([])
 const payments = ref([])
 const debts = ref([])
-const mobileMenuOpen = ref(false)
 
 function goToUser() {
   router.push('/user')
@@ -353,14 +301,5 @@ function goToDashboard() {
 
 function goToProfile() {
   router.push('/profile')
-}
-
-function toggleMobileMenu() {
-  mobileMenuOpen.value = !mobileMenuOpen.value
-}
-
-function navigateMobile(navigationFunction) {
-  mobileMenuOpen.value = false
-  navigationFunction()
 }
 </script>

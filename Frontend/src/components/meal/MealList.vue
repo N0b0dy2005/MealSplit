@@ -11,7 +11,13 @@
     </div>
 
     <div v-else class="space-y-4">
-      <div v-for="meal in meals" :key="meal.id" class="border border-meal-gray-light rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div v-for="meal in meals" :key="meal.id" 
+           :class="[
+             'border rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200',
+             meal.userId === currentUser.id 
+               ? 'border-meal-primary bg-meal-light bg-opacity-30' 
+               : 'border-meal-gray-light'
+           ]">
         <div class="flex flex-col md:flex-row">
           <!-- Datum Spalte -->
           <div class="bg-meal-light p-4 md:w-24 flex flex-col items-center justify-center text-center">
@@ -40,21 +46,28 @@
               </div>
             </div>
 
-            <div class="flex items-center text-sm text-meal-gray mb-2">
+            <div class="flex items-center text-sm mb-2" 
+                 :class="meal.userId === currentUser.id ? 'text-meal-primary font-semibold' : 'text-meal-gray'">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
               </svg>
-              <span>Bezahlt von {{ getUserName(meal.userId) }}</span>
+              <span v-if="meal.userId === currentUser.id">Von dir bezahlt</span>
+              <span v-else>Bezahlt von {{ getUserName(meal.userId) }}</span>
             </div>
 
             <div class="flex flex-wrap gap-1">
               <div v-for="participantId in meal.participants" :key="participantId"
-                   class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-meal-light">
+                   :class="[
+                     'inline-flex items-center px-2 py-1 rounded-full text-xs', 
+                     participantId === currentUser.id 
+                       ? 'bg-meal-primary bg-opacity-20 border border-meal-primary' 
+                       : 'bg-meal-light'
+                   ]">
                 <div class="w-4 h-4 rounded-full flex items-center justify-center text-white font-bold mr-1"
                      :style="{ backgroundColor: getUserColor(participantId) }">
                   {{ getUserInitial(participantId) }}
                 </div>
-                {{ getUserName(participantId) }}
+                {{ participantId === currentUser.id ? 'Du' : getUserName(participantId) }}
               </div>
             </div>
           </div>
@@ -85,13 +98,40 @@
 </template>
 
 <script setup lang="ts">
+// Typ-Definitionen
+import {query} from "../../graphql.ts";
+import {onMounted, ref} from "vue";
+
+interface Product {
+  name: string;
+  price: number;
+  isSpecific?: boolean;
+  specificParticipants?: number[];
+}
+
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Meal {
+  id: number;
+  name: string;
+  date: string;
+  totalAmount: number;
+  userId: number;
+  description?: string;
+  participants: number[];
+  productsData?: Product[];
+}
+
 const props = defineProps({
   meals: {
-    type: Array,
+    type: Array as () => Meal[],
     required: true
   },
   users: {
-    type: Array,
+    type: Array as () => User[],
     required: true
   },
   isFiltered: {
@@ -108,29 +148,44 @@ const avatarColors = [
   '#6A1B9A', '#AD1457', '#C62828', '#EF6C00', '#FF8F00'
 ];
 
-function formatCurrency(value) {
+const currentUser = ref({} as User);
+function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR'
   }).format(value);
 }
 
-function getUserName(userId) {
+function getUserName(userId: number): string {
   const user = props.users.find(u => u.id === userId);
   return user ? user.name : 'Unbekannt';
 }
 
-function getUserInitial(userId) {
+function getUserInitial(userId: number): string {
   const user = props.users.find(u => u.id === userId);
   return user ? user.name.charAt(0).toUpperCase() : '?';
 }
 
-function getUserColor(userId) {
+async function getCurrentUser() {
+  const [data, er] = await query.getCurrentUser()
+  if (er) {
+    console.error('Error fetching current user:', er);
+    return;
+  }
+  // Ensure data is not null before assignment
+  if (data) {
+    currentUser.value = data;
+  }
+}
+function getUserColor(userId: number): string {
   return avatarColors[userId % avatarColors.length];
 }
 
-function getMonthName(monthIndex) {
+function getMonthName(monthIndex: number): string {
   const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
   return months[monthIndex];
 }
+onMounted(() => {
+  getCurrentUser();
+})
 </script>

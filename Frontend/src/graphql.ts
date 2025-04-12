@@ -12,6 +12,14 @@ export interface Activities {
 	userId: number;
 	amount: string;
 	date: string;
+	isConfirmed: boolean;
+}
+
+export interface CurrentMealsResponse {
+	id: number;
+	name: string;
+	totalAmount: string;
+	totalMealsCount: number;
 }
 
 export interface Dashboard {
@@ -31,6 +39,25 @@ export interface Debt {
 	mealsCount: number;
 	createDate: string;
 	updatedDate: string;
+	isConfirmed: boolean;
+	mealId: number;
+}
+
+export interface DebtDetail {
+	id: number;
+	from_user_id: number;
+	to_user_id: number;
+	from_user_name: string;
+	to_user_name: string;
+	amount: string;
+	meals_count: number;
+	create_date: string;
+	is_confirmed: boolean;
+	type: string;
+	meal_id: number;
+	payment_id: number;
+	meal_info: MealInfo;
+	payment_info: PaymentInfo;
 }
 
 export interface Meal {
@@ -43,6 +70,15 @@ export interface Meal {
 	createDate: string;
 	updatedDate: string;
 	userIds: string;
+	products: string;
+}
+
+export interface MealInfo {
+	id: number;
+	name: string;
+	description: string;
+	date: string;
+	total_amount: string;
 }
 
 export interface MealInput {
@@ -52,6 +88,7 @@ export interface MealInput {
 	totalAmount: string;
 	userIds: string;
 	description: string;
+	produkts: string;
 }
 
 export interface Payment {
@@ -61,6 +98,14 @@ export interface Payment {
 	amount: string;
 	description: string;
 	date: string;
+	isConfirmed: boolean;
+}
+
+export interface PaymentInfo {
+	id: number;
+	description: string;
+	date: string;
+	amount: string;
 }
 
 export interface PaymentInput {
@@ -68,16 +113,6 @@ export interface PaymentInput {
 	toUserId: number;
 	amount: string;
 	description: string;
-}
-
-export interface ReceiptItem {
-	name: string;
-	price: number;
-}
-
-export interface ReceiptResult {
-	items: ReceiptItem[];
-	total: number;
 }
 
 export interface TobDebtsPerUser {
@@ -88,6 +123,14 @@ export interface TobDebtsPerUser {
 export interface TotalCreditsPerUser {
 	userId: number;
 	amount: string;
+}
+
+export interface UpdateUserInput {
+	id: number;
+	name: string;
+	email: string;
+	phoneNumber: string;
+	password: string;
 }
 
 export interface Upload {
@@ -102,6 +145,14 @@ export interface User {
 	createDate: string;
 	updatedDate: string;
 	phoneNumber: string;
+	admin: boolean;
+}
+
+export interface UserInput {
+	id: number;
+	name: string;
+	email: string;
+	admin: boolean;
 }
 
 export interface response {
@@ -235,6 +286,68 @@ async function createUser(name: string, email: string): Promise<[response | null
 	}
 }
 
+async function deleteUser(id: number): Promise<[response | null, any | null]> {
+	try {
+		const response = await apolloClient.mutate({
+			mutation: gql(`
+				 mutation deleteUser($id: Int!) {
+					deleteUser(id: $id) {
+						status 
+						message 
+						success 
+					}
+				}
+				`),
+			variables: {
+								id: id
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.deleteUser) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.deleteUser, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
+async function editUser(user: UserInput): Promise<[response | null, any | null]> {
+	try {
+		const response = await apolloClient.mutate({
+			mutation: gql(`
+				 mutation editUser($user: UserInput!) {
+					editUser(user: $user) {
+						status 
+						message 
+						success 
+					}
+				}
+				`),
+			variables: {
+								user: user
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.editUser) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.editUser, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 async function getActivities(): Promise<[Activities[] | null, any | null]> {
 	try {
 		const response = await apolloClient.query({
@@ -249,6 +362,7 @@ async function getActivities(): Promise<[Activities[] | null, any | null]> {
 						userId 
 						amount 
 						date 
+						isConfirmed 
 					}
 				}
 				`),
@@ -266,6 +380,43 @@ async function getActivities(): Promise<[Activities[] | null, any | null]> {
 		}
 	
 		return [response.data.getActivities, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
+async function getCurrentUser(): Promise<[User | null, any | null]> {
+	try {
+		const response = await apolloClient.query({
+			query: gql(`
+				 query getCurrentUser {
+					getCurrentUser {
+						id 
+						name 
+						email 
+						debts 
+						credits 
+						createDate 
+						updatedDate 
+						phoneNumber 
+						admin 
+					}
+				}
+				`),
+			variables: {
+				
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.getCurrentUser) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.getCurrentUser, null];
 	} catch (error) {
 		return [null, error];
 	}
@@ -311,6 +462,60 @@ async function getDashboard(): Promise<[Dashboard | null, any | null]> {
 	}
 }
 
+async function getDebtDetails(fromUserId: number, toUserId: number): Promise<[DebtDetail[] | null, any | null]> {
+	try {
+		const response = await apolloClient.query({
+			query: gql(`
+				 query getDebtDetails($fromUserId: Int!, $toUserId: Int!) {
+					getDebtDetails(fromUserId: $fromUserId, toUserId: $toUserId) {
+						id 
+						from_user_id 
+						to_user_id 
+						from_user_name 
+						to_user_name 
+						amount 
+						meals_count 
+						create_date 
+						is_confirmed 
+						type 
+						meal_id 
+						payment_id 
+						meal_info {
+							id 
+							name 
+							description 
+							date 
+							total_amount 
+						}
+						payment_info {
+							id 
+							description 
+							date 
+							amount 
+						}
+					}
+				}
+				`),
+			variables: {
+								fromUserId: fromUserId,
+				toUserId: toUserId
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.getDebtDetails) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.getDebtDetails, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 async function getDebts(): Promise<[Debt[] | null, any | null]> {
 	try {
 		const response = await apolloClient.query({
@@ -324,6 +529,8 @@ async function getDebts(): Promise<[Debt[] | null, any | null]> {
 						mealsCount 
 						createDate 
 						updatedDate 
+						isConfirmed 
+						mealId 
 					}
 				}
 				`),
@@ -346,6 +553,44 @@ async function getDebts(): Promise<[Debt[] | null, any | null]> {
 	}
 }
 
+async function getMealById(id: number): Promise<[Meal | null, any | null]> {
+	try {
+		const response = await apolloClient.query({
+			query: gql(`
+				 query getMealById($id: Int!) {
+					getMealById(id: $id) {
+						id 
+						name 
+						date 
+						totalAmount 
+						userId 
+						description 
+						createDate 
+						updatedDate 
+						userIds 
+						products 
+					}
+				}
+				`),
+			variables: {
+								id: id
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.getMealById) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.getMealById, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 async function getMeals(): Promise<[Meal[] | null, any | null]> {
 	try {
 		const response = await apolloClient.query({
@@ -361,6 +606,7 @@ async function getMeals(): Promise<[Meal[] | null, any | null]> {
 						createDate 
 						updatedDate 
 						userIds 
+						products 
 					}
 				}
 				`),
@@ -383,6 +629,44 @@ async function getMeals(): Promise<[Meal[] | null, any | null]> {
 	}
 }
 
+async function getMealsForCurrentUser(): Promise<[Meal[] | null, any | null]> {
+	try {
+		const response = await apolloClient.query({
+			query: gql(`
+				 query getMealsForCurrentUser {
+					getMealsForCurrentUser {
+						id 
+						name 
+						date 
+						totalAmount 
+						userId 
+						description 
+						createDate 
+						updatedDate 
+						userIds 
+						products 
+					}
+				}
+				`),
+			variables: {
+				
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.getMealsForCurrentUser) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.getMealsForCurrentUser, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
 async function getPayments(): Promise<[Payment[] | null, any | null]> {
 	try {
 		const response = await apolloClient.query({
@@ -395,6 +679,7 @@ async function getPayments(): Promise<[Payment[] | null, any | null]> {
 						amount 
 						description 
 						date 
+						isConfirmed 
 					}
 				}
 				`),
@@ -431,6 +716,7 @@ async function getUsers(): Promise<[User[] | null, any | null]> {
 						createDate 
 						updatedDate 
 						phoneNumber 
+						admin 
 					}
 				}
 				`),
@@ -453,22 +739,20 @@ async function getUsers(): Promise<[User[] | null, any | null]> {
 	}
 }
 
-async function uploadReceipt(file: Upload): Promise<[ReceiptResult | null, any | null]> {
+async function logout(): Promise<[response | null, any | null]> {
 	try {
 		const response = await apolloClient.mutate({
 			mutation: gql(`
-				 mutation uploadReceipt($file: Upload!) {
-					uploadReceipt(file: $file) {
-						items {
-							name 
-							price 
-						}
-						total 
+				 mutation logout {
+					logout {
+						status 
+						message 
+						success 
 					}
 				}
 				`),
 			variables: {
-								file: file
+				
 			}
 		});
 	
@@ -476,11 +760,42 @@ async function uploadReceipt(file: Upload): Promise<[ReceiptResult | null, any |
 			return [null, response.errors];
 		}
 	
-		if (!response.data || !response.data.uploadReceipt) {
+		if (!response.data || !response.data.logout) {
 			return [null, new Error(`Invalid response structure`)];
 		}
 	
-		return [response.data.uploadReceipt, null];
+		return [response.data.logout, null];
+	} catch (error) {
+		return [null, error];
+	}
+}
+
+async function updateUser(user: UpdateUserInput): Promise<[response | null, any | null]> {
+	try {
+		const response = await apolloClient.mutate({
+			mutation: gql(`
+				 mutation updateUser($user: UpdateUserInput!) {
+					updateUser(user: $user) {
+						status 
+						message 
+						success 
+					}
+				}
+				`),
+			variables: {
+								user: user
+			}
+		});
+	
+		if (response.errors && response.errors.length > 0) {
+			return [null, response.errors];
+		}
+	
+		if (!response.data || !response.data.updateUser) {
+			return [null, new Error(`Invalid response structure`)];
+		}
+	
+		return [response.data.updateUser, null];
 	} catch (error) {
 		return [null, error];
 	}
@@ -488,9 +803,13 @@ async function uploadReceipt(file: Upload): Promise<[ReceiptResult | null, any |
 
 export const query = {
 	getActivities,
+	getCurrentUser,
 	getDashboard,
+	getDebtDetails,
 	getDebts,
+	getMealById,
 	getMeals,
+	getMealsForCurrentUser,
 	getPayments,
 	getUsers
 };
@@ -499,7 +818,10 @@ export const mutation = {
 	createPayment,
 	createPost,
 	createUser,
-	uploadReceipt
+	deleteUser,
+	editUser,
+	logout,
+	updateUser
 };
 
 

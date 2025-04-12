@@ -12,6 +12,7 @@ type User {
     createDate: String!
     updatedDate: String!
     phoneNumber: String!
+    admin: Boolean!
 }
 type Meal {
     id : Int!
@@ -23,6 +24,14 @@ type Meal {
     createDate: String!
     updatedDate: String!
     userIds: String!
+    products: String!
+}
+
+type CurrentMealsResponse {
+    id: Int!
+    name: String!
+    totalAmount: String!
+    totalMealsCount: Int!
 }
 
 
@@ -40,6 +49,7 @@ input MealInput {
     totalAmount: String!
     userIds: String!
     description: String!
+    produkts: String!
 }
 input PaymentInput {
     fromUserId: Int!
@@ -54,7 +64,7 @@ type Payment {
     amount: String!
     description: String!
     date: String!
-
+    isConfirmed: Boolean!
 }
 type Debt {
     id: Int!
@@ -64,6 +74,8 @@ type Debt {
     mealsCount: Int!
     createDate: String!
     updatedDate: String!
+    isConfirmed: Boolean!
+    mealId: Int!
 }
 type Activities {
     id: Int!
@@ -74,21 +86,26 @@ type Activities {
     userId: Int!
     amount: String!
     date: String!
-}
-type ReceiptItem {
-    name: String!
-    price: Float!
-}
-
-type ReceiptResult {
-    items: [ReceiptItem!]!
-    total: Float!
+    isConfirmed: Boolean!
 }
 
 
 type TotalCreditsPerUser {
     userId: Int!
     amount: String!
+}
+input UserInput {
+    id: Int!
+    name: String!
+    email: String!
+    admin: Boolean!
+}
+input UpdateUserInput {
+    id: Int!
+    name: String!
+    email: String!
+    phoneNumber: String!
+    password: String!
 }
 
 type TobDebtsPerUser {
@@ -103,6 +120,39 @@ type Dashboard {
     tobDebtsPerUser: [TobDebtsPerUser!]!
     totalCreditsPerUser: [TotalCreditsPerUser!]!
 }
+type MealInfo {
+    id: Int!
+    name: String!
+    description: String
+    date: String!
+    total_amount: String!
+}
+
+# Informationen zu einer Zahlung im Kontext einer Schuld
+type PaymentInfo {
+    id: Int!
+    description: String
+    date: String!
+    amount: String!
+}
+
+# Erweiterter DebtDetail-Type für detaillierte Schuldenansicht
+type DebtDetail {
+    id: Int!
+    from_user_id: Int!
+    to_user_id: Int!
+    from_user_name: String!
+    to_user_name: String!
+    amount: String!
+    meals_count: Int!
+    create_date: String!
+    is_confirmed: Boolean!
+    type: String!  # "meal" oder "payment"
+    meal_id: Int
+    payment_id: Int
+    meal_info: MealInfo
+    payment_info: PaymentInfo
+}
 type Query {
     getUsers: [User!]!
     getMeals: [Meal!]!
@@ -110,13 +160,22 @@ type Query {
     getDebts: [Debt!]!
     getActivities: [Activities!]!
     getDashboard: Dashboard!
+    getCurrentUser: User!
+    getMealById(id: Int!): Meal!
+    getMealsForCurrentUser: [Meal!]!
+    getDebtDetails(fromUserId: Int!, toUserId: Int!): [DebtDetail!]!
 }
 
+
+
 type Mutation {
-    uploadReceipt(file: Upload!): ReceiptResult!
+    editUser(user: UserInput!): response!
+    deleteUser(id: Int!): response!
     createPost(content: String!): response!
     createUser(name: String!, email: String!): response!
     createMeal(meal: MealInput!): response!
     createPayment(payment: PaymentInput!): response!
+    logout: response!
+    updateUser(user: UpdateUserInput!): response!
 }
 

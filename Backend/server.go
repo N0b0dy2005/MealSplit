@@ -33,6 +33,7 @@ type User struct {
 	ID       int            `db:"id"`
 	Email    sql.NullString `db:"email"`
 	Password sql.NullString `db:"password"`
+	Admin    sql.NullInt64  `db:"admin"`
 }
 
 // loginRequest repräsentiert die JSON-Daten, die beim Login erwartet werden.
@@ -72,6 +73,7 @@ func main() {
 	mux := http.NewServeMux()
 	// Unprotected Login-Route
 	mux.HandleFunc("/api/login", loginHandler(db))
+
 	// Alle weiteren Routen werden durch die Auth-Middleware geschützt
 	mux.Handle("/api/playground", authMiddleware(playground.Handler("GraphQL playground", "/query"), db))
 	mux.Handle("/api/query", authMiddleware(srv, db))
@@ -107,7 +109,7 @@ func loginHandler(db *sqlx.DB) http.HandlerFunc {
 
 		// Abrufen des Benutzers anhand der E-Mail
 		var user User
-		err := db.Get(&user, "SELECT id, email, password  FROM users WHERE email = ?", req.Email)
+		err := db.Get(&user, "SELECT id, email, password, admin  FROM users WHERE email = ?", req.Email)
 		if err != nil {
 			http.Error(w, "Ungültige Anmeldedaten", http.StatusUnauthorized)
 			return
@@ -116,11 +118,6 @@ func loginHandler(db *sqlx.DB) http.HandlerFunc {
 		// hash req.Password as  sha256.New in 64 bytes
 		hash := fmt.Sprintf("%x", sha256.Sum256([]byte(req.Password)))
 
-		// In your loginHandler function, add these lines:
-		fmt.Println("Provided email:", req.Email)
-		fmt.Println("Generated hash:", hash)
-		fmt.Println("Stored password:", user.Password.String)
-		fmt.Println("Password valid?", user.Password.Valid)
 		// Überprüfung des Passworts (Hinweis: In einer echten Anwendung sollte das Passwort gehasht sein)
 		if !user.Password.Valid || user.Password.String != hash {
 			http.Error(w, "Ungültige Anmeldedaten", http.StatusUnauthorized)
@@ -129,6 +126,7 @@ func loginHandler(db *sqlx.DB) http.HandlerFunc {
 
 		// Erstellen eines JWT-Tokens mit einer Gültigkeit von 24 Stunden
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"admin":   user.Admin,
 			"user_id": user.ID,
 			"exp":     time.Now().Add(24 * time.Hour).Unix(),
 		})
@@ -187,8 +185,10 @@ func authMiddleware(next http.Handler, db *sqlx.DB) http.Handler {
 			return
 		}
 		userId := cast.ToInt(claims["user_id"])
-
-		newCtx := context.WithValue(r.Context(), "controllerService", controller.CreateService(db, userId))
+		admin := cast.ToInt(claims["admin"])
+		fmt.Println("tokens", userId, admin)
+		// Check if userId is valid)
+		newCtx := context.WithValue(r.Context(), "controllerService", controller.CreateService(db, userId, cast.ToBool(admin), w))
 		next.ServeHTTP(w, r.WithContext(newCtx))
 	})
 }

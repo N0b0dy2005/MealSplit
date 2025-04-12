@@ -5,28 +5,6 @@ import (
 	"my-backend/graph/model"
 )
 
-// TotalCreditsPerUser represents the total credits for a user
-type TotalCreditsPerUser struct {
-	UserId int    `db:"userId"`
-	Amount string `db:"amount"`
-}
-
-// TobDebtsPerUser represents the total debts for a user
-type TobDebtsPerUser struct {
-	UserId int    `db:"userId"`
-	Amount string `db:"amount"`
-}
-
-// Dashboard is the internal representation of dashboard data
-type Dashboard struct {
-	totalUsers          int
-	totalMeals          int
-	totalDebts          string
-	totalCredits        string
-	tobDebtsPerUser     []TobDebtsPerUser
-	totalCreditsPerUser []TotalCreditsPerUser
-}
-
 // GetDashboard fetches dashboard data from database
 func (d *Service) GetDashboard() (*model.Dashboard, error) {
 	var dashboard Dashboard
@@ -58,17 +36,18 @@ func (d *Service) GetDashboard() (*model.Dashboard, error) {
 		return nil, err
 	}
 
-	// Group by from_user_id since that's the debtor
+	// from_user_id represents the debtor (who owes money)
+	// Get top 3 debtors with highest debts
 	err = d.DB.Select(&dashboard.tobDebtsPerUser,
-		"SELECT from_user_id as userId, SUM(amount) as amount FROM debts GROUP BY from_user_id")
+		"SELECT from_user_id as userId, SUM(amount) as amount FROM debts GROUP BY from_user_id ORDER BY SUM(amount) DESC LIMIT 3")
 	if err != nil {
 		log.Println("Error fetching debts per user:", err)
 		return nil, err
 	}
 
-	// Use total_amount for meals
+	// Use total_amount for meals and order by DESC
 	err = d.DB.Select(&dashboard.totalCreditsPerUser,
-		"SELECT user_id as userId, SUM(total_amount) as amount FROM meals GROUP BY user_id")
+		"SELECT user_id as userId, SUM(total_amount) as amount FROM meals GROUP BY user_id ORDER BY SUM(total_amount) DESC")
 	if err != nil {
 		log.Println("Error fetching credits per user:", err)
 		return nil, err
@@ -89,24 +68,6 @@ func (d *Service) GetDashboard() (*model.Dashboard, error) {
 			UserID: credit.UserId,
 			Amount: credit.Amount,
 		})
-	}
-
-	// order modelTotalCreditsPerUser by amount
-	for i := 0; i < len(modelTotalCreditsPerUser); i++ {
-		for j := i + 1; j < len(modelTotalCreditsPerUser); j++ {
-			if modelTotalCreditsPerUser[i].Amount < modelTotalCreditsPerUser[j].Amount {
-				modelTotalCreditsPerUser[i], modelTotalCreditsPerUser[j] = modelTotalCreditsPerUser[j], modelTotalCreditsPerUser[i]
-			}
-		}
-	}
-
-	// order modelTobDebtsPerUser by amount
-	for i := 0; i < len(modelTobDebtsPerUser); i++ {
-		for j := i + 1; j < len(modelTobDebtsPerUser); j++ {
-			if modelTobDebtsPerUser[i].Amount < modelTobDebtsPerUser[j].Amount {
-				modelTobDebtsPerUser[i], modelTobDebtsPerUser[j] = modelTobDebtsPerUser[j], modelTobDebtsPerUser[i]
-			}
-		}
 	}
 
 	result := &model.Dashboard{

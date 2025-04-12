@@ -11,6 +11,14 @@ type Activities struct {
 	UserID      int    `json:"userId"`
 	Amount      string `json:"amount"`
 	Date        string `json:"date"`
+	IsConfirmed bool   `json:"isConfirmed"`
+}
+
+type CurrentMealsResponse struct {
+	ID              int    `json:"id"`
+	Name            string `json:"name"`
+	TotalAmount     string `json:"totalAmount"`
+	TotalMealsCount int    `json:"totalMealsCount"`
 }
 
 type Dashboard struct {
@@ -30,6 +38,25 @@ type Debt struct {
 	MealsCount  int    `json:"mealsCount"`
 	CreateDate  string `json:"createDate"`
 	UpdatedDate string `json:"updatedDate"`
+	IsConfirmed bool   `json:"isConfirmed"`
+	MealID      int    `json:"mealId"`
+}
+
+type DebtDetail struct {
+	ID           int          `json:"id"`
+	FromUserID   int          `json:"from_user_id"`
+	ToUserID     int          `json:"to_user_id"`
+	FromUserName string       `json:"from_user_name"`
+	ToUserName   string       `json:"to_user_name"`
+	Amount       string       `json:"amount"`
+	MealsCount   int          `json:"meals_count"`
+	CreateDate   string       `json:"create_date"`
+	IsConfirmed  bool         `json:"is_confirmed"`
+	Type         string       `json:"type"`
+	MealID       *int         `json:"meal_id,omitempty"`
+	PaymentID    *int         `json:"payment_id,omitempty"`
+	MealInfo     *MealInfo    `json:"meal_info,omitempty"`
+	PaymentInfo  *PaymentInfo `json:"payment_info,omitempty"`
 }
 
 type Meal struct {
@@ -42,6 +69,15 @@ type Meal struct {
 	CreateDate  string `json:"createDate"`
 	UpdatedDate string `json:"updatedDate"`
 	UserIds     string `json:"userIds"`
+	Products    string `json:"products"`
+}
+
+type MealInfo struct {
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Date        string  `json:"date"`
+	TotalAmount string  `json:"total_amount"`
 }
 
 type MealInput struct {
@@ -51,6 +87,7 @@ type MealInput struct {
 	TotalAmount string `json:"totalAmount"`
 	UserIds     string `json:"userIds"`
 	Description string `json:"description"`
+	Produkts    string `json:"produkts"`
 }
 
 type Mutation struct {
@@ -63,6 +100,14 @@ type Payment struct {
 	Amount      string `json:"amount"`
 	Description string `json:"description"`
 	Date        string `json:"date"`
+	IsConfirmed bool   `json:"isConfirmed"`
+}
+
+type PaymentInfo struct {
+	ID          int     `json:"id"`
+	Description *string `json:"description,omitempty"`
+	Date        string  `json:"date"`
+	Amount      string  `json:"amount"`
 }
 
 type PaymentInput struct {
@@ -75,16 +120,6 @@ type PaymentInput struct {
 type Query struct {
 }
 
-type ReceiptItem struct {
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-}
-
-type ReceiptResult struct {
-	Items []*ReceiptItem `json:"items"`
-	Total float64        `json:"total"`
-}
-
 type TobDebtsPerUser struct {
 	UserID int    `json:"userId"`
 	Amount string `json:"amount"`
@@ -93,6 +128,14 @@ type TobDebtsPerUser struct {
 type TotalCreditsPerUser struct {
 	UserID int    `json:"userId"`
 	Amount string `json:"amount"`
+}
+
+type UpdateUserInput struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	PhoneNumber string `json:"phoneNumber"`
+	Password    string `json:"password"`
 }
 
 type User struct {
@@ -104,6 +147,14 @@ type User struct {
 	CreateDate  string `json:"createDate"`
 	UpdatedDate string `json:"updatedDate"`
 	PhoneNumber string `json:"phoneNumber"`
+	Admin       bool   `json:"admin"`
+}
+
+type UserInput struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Admin bool   `json:"admin"`
 }
 
 type Response struct {

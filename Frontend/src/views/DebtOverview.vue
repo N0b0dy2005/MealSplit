@@ -1,53 +1,15 @@
 <template>
-  <div class="min-h-screen flex flex-col flex-grow bg-meal-light font-sans pb-8">
-    <!-- Header -->
-    <header class="bg-meal-primary text-white p-4 shadow-md mb-8">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <h1 class="text-xl sm:text-2xl font-header font-bold">
-            <span class="hidden sm:inline">Schuldenübersicht</span>
-            <span class="sm:hidden">Beträge</span>
-          </h1>
-        </div>
-        <button @click="goBackToHomeScreen" class="text-white  hover:text-meal-accent-light transition-colors duration-200">
-          <span class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span class="hidden sm:inline">Zurück zur Startseite</span>
-            <span class="sm:hidden">Zurück</span>
-          </span>
-        </button>
-      </div>
-    </header>
-
-    <div class="container mx-auto px-4">
+  <div class="h-screen overflow-auto flex flex-col bg-meal-light font-sans pb-8">
+    <div class="container mx-auto px-4 mt-8">
       <!-- Zusammenfassung -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Offene Beträge</h3>
-          <p class="text-2xl sm:text-3xl font-bold text-meal-error">{{ formatCurrency(totalDebt) }}</p>
-          <p class="text-xs sm:text-sm text-meal-gray mt-1">Summe aller ausstehenden Beträge</p>
-        </div>
+        <StatCard title="Offene Beträge" :value="totalDebt" caption="Summe aller ausstehenden Beträge" is-currency
+                  value-color="text-meal-error"/>
 
-        <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Aktive Transaktionen</h3>
-          <p class="text-2xl sm:text-3xl font-bold text-meal-primary">{{ debts.length }}</p>
-          <p class="text-xs sm:text-sm text-meal-gray mt-1">Anzahl der offenen Schuldenbeziehungen</p>
-        </div>
+        <StatCard title="Aktive Transaktionen" :value="debts.length" caption="Anzahl der offenen Schuldenbeziehungen"
+                  value-color="text-meal-primary"/>
 
-        <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-1 sm:mb-2">Letzte Zahlung</h3>
-          <p class="text-lg sm:text-xl font-bold text-meal-positive">{{ formatCurrency(lastPayment.amount) }}</p>
-          <p class="text-xs sm:text-sm text-meal-gray mt-1">
-            {{ lastPayment.from }} → {{ lastPayment.to }} ({{ formatDate(lastPayment.date) }})
-          </p>
-        </div>
       </div>
-
       <!-- Hauptansicht mit Tabs -->
       <div class="bg-white rounded-xl shadow-meal overflow-hidden mb-8">
         <div class="flex border-b border-meal-gray-light">
@@ -62,7 +24,9 @@
           >
             <span class="flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      clip-rule="evenodd"/>
               </svg>
               <span class="hidden sm:inline">Beträge Liste</span>
             </span>
@@ -78,34 +42,21 @@
           >
             <span class="flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <path
+                    d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
               </svg>
               <span class="hidden sm:inline">Beträge Matrix</span>
             </span>
           </button>
-          <button
-              @click="activeTab = 'optimize'"
-              :class="[
-              'py-2 sm:py-4 px-2 sm:px-6 font-bold text-center flex-1 text-sm sm:text-base',
-              activeTab === 'optimize'
-                ? 'text-meal-primary border-b-2 border-meal-primary'
-                : 'text-meal-gray hover:text-meal-gray-dark'
-            ]"
-          >
-            <span class="flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-              </svg>
-              <span class="hidden sm:inline">Optimierte Zahlungen</span>
-            </span>
-          </button>
         </div>
 
-        <!-- Beträge Liste Ansicht -->
+        <!-- Tabs-Inhalte (ListTab, MatrixTab) -->
         <div v-if="activeTab === 'list'" class="p-4 sm:p-6">
           <div v-if="debts.length === 0" class="text-center py-6 sm:py-8 text-meal-gray">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-meal-gray-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-meal-gray-light"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <p class="text-lg sm:text-xl mb-2">Keine offenen Beträge</p>
             <p>Alle Beträge sind bezahlt. Gut gemacht!</p>
@@ -117,55 +68,110 @@
               <table class="min-w-full bg-white">
                 <thead>
                 <tr class="bg-meal-light text-meal-dark text-left">
-                  <th class="py-3 px-4 rounded-tl-lg">Schuldner</th>
-                  <th class="py-3 px-4 text-center">Schuldet</th>
-                  <th class="py-3 px-4">Gläubiger</th>
-                  <th class="py-3 px-4 text-center">Basierend auf</th>
+                  <th class="py-3 px-4 rounded-tl-lg w-1/4">
+                    <div class="flex items-center">
+                      <div
+                          class="w-6 h-6 rounded-full bg-meal-error flex items-center justify-center text-white font-bold mr-2 text-xs">
+                        S
+                      </div>
+                      <span>Schuldner</span>
+                    </div>
+                  </th>
+                  <th class="py-3 px-4 text-center w-1/5">
+                    <div class="flex flex-col items-center">
+                      <span class="text-xl font-bold text-meal-error">€</span>
+                      <span>Schuldet Betrag</span>
+                    </div>
+                  </th>
+                  <th class="py-3 px-4 w-1/4">
+                    <div class="flex items-center">
+                      <div
+                          class="w-6 h-6 rounded-full bg-meal-positive flex items-center justify-center text-white font-bold mr-2 text-xs">
+                        G
+                      </div>
+                      <span>Gläubiger</span>
+                    </div>
+                  </th>
+                  <th class="py-3 px-4 text-center">Details</th>
                   <th class="py-3 px-4 rounded-tr-lg text-right">Aktionen</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(debt, index) in debts" :key="index" class="border-b border-meal-gray-light hover:bg-meal-gray-light transition-colors duration-150">
+                <tr v-for="(debt, index) in debts" :key="index"
+                    class="border-b border-meal-gray-light hover:bg-meal-gray-light transition-colors duration-150"
+                    :class="{'opacity-50': !debt.isConfirmed}">
                   <!-- Schuldner -->
                   <td class="py-3 px-4">
-                    <div class="flex items-center">
+                    <div class="flex items-center bg-red-50 p-2 rounded-lg">
                       <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-3"
                            :style="{ backgroundColor: getUserColor(debt.fromUserId) }">
                         {{ debt.from.name.charAt(0).toUpperCase() }}
                       </div>
-                      {{ debt.from.name }}
+                      <div>
+                        <div class="font-bold">{{ debt.from.name }}</div>
+                        <div class="text-xs text-meal-error font-medium">
+                          Schuldet Geld
+                          <span v-if="!debt.isConfirmed" class="text-meal-gray ml-1">(Ausstehend)</span>
+                        </div>
+                      </div>
                     </div>
                   </td>
 
                   <!-- Betrag -->
                   <td class="py-3 px-4 text-center">
-                    <span class="font-bold text-meal-error">{{ formatCurrency(debt.amount) }}</span>
+                    <div class="flex flex-col items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-meal-error mb-1" fill="none"
+                           viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                      </svg>
+                      <span class="text-xl font-bold text-meal-error">{{ formatCurrency(debt.amount) }}</span>
+                    </div>
                   </td>
 
                   <!-- Gläubiger -->
                   <td class="py-3 px-4">
-                    <div class="flex items-center">
+                    <div class="flex items-center bg-green-50 p-2 rounded-lg">
                       <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-3"
                            :style="{ backgroundColor: getUserColor(debt.toUserId) }">
                         {{ debt.to.name.charAt(0).toUpperCase() }}
                       </div>
-                      {{ debt.to.name }}
+                      <div>
+                        <div class="font-bold">{{ debt.to.name }}</div>
+                        <div class="text-xs text-meal-positive font-medium">Bekommt Geld</div>
+                      </div>
                     </div>
                   </td>
 
-                  <!-- Mahlzeiten -->
+                  <!-- Details Button statt Mahlzeiten -->
                   <td class="py-3 px-4 text-center">
-                    <span>{{ debt.meals }} Mahlzeiten</span>
+                    <button 
+                      @click="showDebtDetails(debt)"
+                      class="bg-meal-light hover:bg-meal-gray-light text-meal-primary px-3 py-1 rounded-lg transition-colors duration-200"
+                    >
+                     Mahlzeiten anzeigen
+                    </button>
                   </td>
-
+                  
                   <!-- Aktionen -->
-                  <td class="py-3 px-4 text-right">
+                  <td v-if="debt.isConfirmed" class="py-3 px-4 text-right">
                     <button
                         @click="markAsPaid(index)"
-                        class="bg-meal-primary hover:bg-meal-dark text-white px-3 py-1 rounded transition-colors duration-200"
+                        class="bg-meal-primary hover:bg-meal-dark text-white px-3 py-1 rounded transition-colors duration-200 w-48"
                     >
                       Als bezahlt markieren
                     </button>
+                  </td>
+                  <td v-else-if="!debt.isConfirmed && currentUser?.id == debt.toUserId " class="py-3 px-4 text-right">
+                    <button
+                        @click="markAsPaid(index)"
+                        class="bg-meal-accent hover:bg-meal-accent-dark text-white px-3 py-1 rounded transition-colors duration-200 w-48"
+                    >
+                      Zahlung bestätigen
+                    </button>
+                  </td>
+                  <td v-else class="py-3 px-4 text-right">
+                    <span class="text-sm font-medium text-meal-accent">Zahlung ist ausstehend</span>
                   </td>
                 </tr>
                 </tbody>
@@ -175,70 +181,98 @@
             <!-- Mobile Cards -->
             <div class="sm:hidden space-y-4">
               <div v-for="(debt, index) in debts" :key="index"
-                   class="bg-white border border-meal-gray-light rounded-lg overflow-hidden">
+                   class="bg-white border border-meal-gray-light rounded-lg overflow-hidden"
+                   :class="{'opacity-50': !debt.isConfirmed}">
                 <div class="p-4">
-                  <div class="flex justify-between items-center mb-3">
-                    <!-- Schuldner info -->
-                    <div class="flex items-center">
+                  <div class="flex flex-col mb-3">
+                    <div class="flex items-center bg-red-50 p-2 rounded-lg mb-2">
                       <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2"
                            :style="{ backgroundColor: getUserColor(debt.fromUserId) }">
                         {{ debt.from.name.charAt(0).toUpperCase() }}
                       </div>
                       <div>
-                        <div class="text-xs text-meal-gray">Schuldner</div>
                         <div class="font-medium text-sm">{{ debt.from.name }}</div>
+                        <div class="text-xs text-meal-error">
+                          Schuldner
+                          <span v-if="!debt.isConfirmed" class="text-meal-gray ml-1">(Ausstehend)</span>
+                        </div>
                       </div>
                     </div>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-meal-gray mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
+                    <div class="flex justify-center items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-meal-error" fill="none"
+                           viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                      </svg>
+                      <span class="mx-2 text-xl font-bold text-meal-error">{{ formatCurrency(debt.amount) }}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-meal-error" fill="none"
+                           viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                      </svg>
+                    </div>
 
-                    <!-- Gläubiger info -->
-                    <div class="flex items-center">
-                      <div>
-                        <div class="text-xs text-meal-gray text-right">Gläubiger</div>
-                        <div class="font-medium text-sm text-right">{{ debt.to.name }}</div>
-                      </div>
-                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ml-2"
+                    <div class="flex items-center bg-green-50 p-2 rounded-lg mt-2">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2"
                            :style="{ backgroundColor: getUserColor(debt.toUserId) }">
                         {{ debt.to.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <div>
+                        <div class="font-medium text-sm">{{ debt.to.name }}</div>
+                        <div class="text-xs text-meal-positive">Gläubiger</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="flex justify-between items-center mb-3">
-                    <div class="text-center flex-1">
-                      <div class="text-xs text-meal-gray">Betrag</div>
-                      <div class="text-lg font-bold text-meal-error">{{ formatCurrency(debt.amount) }}</div>
-                    </div>
-                    <div class="text-center flex-1">
-                      <div class="text-xs text-meal-gray">Basis</div>
-                      <div class="text-sm">{{ debt.meals }} Mahlzeiten</div>
-                    </div>
+                    <button 
+                      @click="showDebtDetails(debt)"
+                      class="w-full bg-meal-light hover:bg-meal-gray-light text-meal-primary px-3 py-2 rounded-lg transition-colors duration-200 text-sm"
+                    >
+                      {{ debt.meals }} Mahlzeiten anzeigen
+                    </button>
                   </div>
-
                   <button
+                      v-if="debt.isConfirmed"
                       @click="markAsPaid(index)"
                       class="w-full bg-meal-primary hover:bg-meal-dark text-white px-3 py-2 rounded transition-colors duration-200 text-sm"
                   >
                     Als bezahlt markieren
                   </button>
+                  <button
+                      v-else-if="!debt.isConfirmed && currentUser?.id == debt.toUserId"
+                      @click="markAsPaid(index)"
+                      class="w-full bg-meal-accent hover:bg-meal-accent-dark text-white px-3 py-2 rounded transition-colors duration-200 text-sm"
+                  >
+                    Zahlung bestätigen
+                  </button>
+                  <div v-else class="w-full text-center text-meal-accent text-sm font-medium py-2">
+                    Zahlung ist ausstehend
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Beträge Matrix Ansicht -->
+        <!-- Matrix-Ansicht -->
         <div v-if="activeTab === 'matrix'" class="p-4 sm:p-6">
           <!-- Matrix View (Desktop only) -->
           <div class="hidden sm:block overflow-x-auto">
+            <div class="bg-meal-light p-3 mb-4 rounded-lg text-sm text-meal-gray-dark">
+              <p>In der Matrix unten zeigt jede <span class="font-bold text-meal-error">rote Zelle</span> an, dass die
+                Person in der Zeile der Person in der Spalte Geld schuldet.</p>
+              <p>Jede <span class="font-bold text-meal-positive">grüne Zelle</span> zeigt an, dass die Person in der
+                Zeile von der Person in der Spalte Geld bekommt.</p>
+            </div>
             <table class="min-w-full bg-white">
               <thead>
               <tr class="bg-meal-light text-meal-dark text-left">
-                <th class="py-3 px-4 rounded-tl-lg">Benutzer</th>
-                <th v-for="user in users" :key="user.id" class="py-3 px-4 text-center">
+                <th class="py-3 px-4 rounded-tl-lg border-b-2 border-r-2 border-meal-gray-light">Benutzer ↓ schuldet →
+                </th>
+                <th v-for="user in users" :key="user.id"
+                    class="py-3 px-4 text-center border-b-2 border-meal-gray-light">
                   <div class="flex flex-col items-center">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mb-1"
                          :style="{ backgroundColor: getUserColor(user.id) }">
@@ -247,12 +281,13 @@
                     <span class="text-xs">{{ user.name }}</span>
                   </div>
                 </th>
-                <th class="py-3 px-4 rounded-tr-lg text-center">Gesamt</th>
+                <th class="py-3 px-4 rounded-tr-lg text-center border-b-2 border-l-2 border-meal-gray-light">Bilanz</th>
               </tr>
               </thead>
               <tbody>
-              <tr v-for="fromUser in users" :key="fromUser.id" class="border-b border-meal-gray-light hover:bg-meal-gray-light transition-colors duration-150">
-                <td class="py-3 px-4">
+              <tr v-for="fromUser in users" :key="fromUser.id"
+                  class="border-b border-meal-gray-light hover:bg-meal-gray-light transition-colors duration-150">
+                <td class="py-3 px-4 border-r-2 border-meal-gray-light">
                   <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2"
                          :style="{ backgroundColor: getUserColor(fromUser.id) }">
@@ -263,17 +298,19 @@
                 </td>
                 <td v-for="toUser in users" :key="toUser.id" class="py-3 px-4 text-center">
                   <template v-if="fromUser.id !== toUser.id">
-                      <span v-if="getDebtAmount(fromUser.id, toUser.id) > 0" class="font-bold text-meal-error">
+                      <span v-if="getDebtAmount(fromUser.id, toUser.id) > 0"
+                            class="inline-block p-2 bg-red-50 rounded-lg font-bold text-meal-error">
                         {{ formatCurrency(getDebtAmount(fromUser.id, toUser.id)) }}
                       </span>
-                    <span v-else-if="getDebtAmount(toUser.id, fromUser.id) > 0" class="font-bold text-meal-positive">
+                    <span v-else-if="getDebtAmount(toUser.id, fromUser.id) > 0"
+                          class="inline-block p-2 bg-green-50 rounded-lg font-bold text-meal-positive">
                         {{ formatCurrency(getDebtAmount(toUser.id, fromUser.id)) }}
                       </span>
                     <span v-else class="text-meal-gray">-</span>
                   </template>
-                  <span v-else class="text-meal-gray">x</span>
+                  <span v-else class="text-meal-gray">-</span>
                 </td>
-                <td class="py-3 px-4 text-center font-bold" :class="{
+                <td class="py-3 px-4 text-center font-bold border-l-2 border-meal-gray-light" :class="{
                     'text-meal-error': getUserBalance(fromUser.id) < 0,
                     'text-meal-positive': getUserBalance(fromUser.id) > 0,
                     'text-meal-gray': getUserBalance(fromUser.id) === 0
@@ -317,8 +354,10 @@
                 Keine offenen Beträge vorhanden.
               </div>
               <div v-else class="space-y-2">
+
                 <div v-for="(debt, index) in debts" :key="index"
-                     class="p-2 border border-meal-gray-light rounded-lg flex justify-between items-center">
+                     class="p-2 border border-meal-gray-light rounded-lg flex justify-between items-center"
+                     :class="{'opacity-50': !debt.isConfirmed}">
                   <div class="flex items-center text-sm">
                     <div class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
                          :style="{ backgroundColor: getUserColor(debt.fromUserId) }">
@@ -329,7 +368,9 @@
                          :style="{ backgroundColor: getUserColor(debt.toUserId) }">
                       {{ debt.to.name.charAt(0).toUpperCase() }}
                     </div>
+                    <span v-if="!debt.isConfirmed" class="text-xs text-meal-gray ml-1">(Ausstehend)</span>
                   </div>
+
                   <span class="font-bold text-meal-error text-sm">{{ formatCurrency(debt.amount) }}</span>
                 </div>
               </div>
@@ -337,296 +378,143 @@
           </div>
 
           <div class="flex justify-center mt-4 text-xs sm:text-sm text-meal-gray flex-wrap gap-2">
-            <div class="flex items-center mr-2 sm:mr-4">
+            <div class="flex items-center mr-2 sm:mr-4 bg-red-50 p-1 px-2 rounded">
               <div class="w-3 h-3 bg-meal-error rounded-full mr-1"></div>
-              <span>Schuldet Geld</span>
+              <span class="font-medium">Schuldet Geld</span>
             </div>
-            <div class="flex items-center mr-2 sm:mr-4">
+            <div class="flex items-center mr-2 sm:mr-4 bg-green-50 p-1 px-2 rounded">
               <div class="w-3 h-3 bg-meal-positive rounded-full mr-1"></div>
-              <span>Bekommt Geld</span>
+              <span class="font-medium">Bekommt Geld</span>
             </div>
-            <div class="flex items-center">
-              <div class="w-3 h-3 bg-meal-gray-light rounded-full mr-1"></div>
-              <span>Keine Verbindung</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Optimierte Zahlungen -->
-        <div v-if="activeTab === 'optimize'" class="p-4 sm:p-6">
-          <div class="bg-meal-light p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
-            <p class="text-sm text-meal-gray-dark mb-0 sm:mb-2">
-              Die folgenden Zahlungen sind optimiert, um die Anzahl der Transaktionen zu minimieren.
-              Anstatt viele kleine Zahlungen zwischen allen Benutzern, empfehlen wir diese effizientere Lösung.
-            </p>
-          </div>
-
-          <div v-if="optimizedPayments.length === 0" class="text-center py-6 sm:py-8 text-meal-gray">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-meal-gray-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p class="text-lg sm:text-xl mb-2">Keine Zahlungen notwendig</p>
-            <p>Alle Beträge sind bereits ausgeglichen.</p>
-          </div>
-
-          <div v-else class="space-y-4 sm:space-y-6">
-            <div v-for="(payment, index) in optimizedPayments" :key="index"
-                 class="bg-white border border-meal-gray-light rounded-lg overflow-hidden">
-              <!-- Desktop Layout -->
-              <div class="hidden sm:flex items-center p-4 bg-meal-light">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3"
-                     :style="{ backgroundColor: getUserColor(payment.fromUserId) }">
-                  {{ payment.from.name.charAt(0).toUpperCase() }}
-                </div>
-                <div class="flex-grow">
-                  <p class="font-bold text-meal-gray-dark">{{ payment.from.name }}</p>
-                  <p class="text-sm text-meal-gray">zahlt an</p>
-                </div>
-                <div class="font-bold text-2xl text-meal-error mx-4">
-                  {{ formatCurrency(payment.amount) }}
-                </div>
-                <div class="flex items-center">
-                  <div class="flex-grow text-right mr-3">
-                    <p class="font-bold text-meal-gray-dark">{{ payment.to.name }}</p>
-                    <p class="text-sm text-meal-gray">erhält</p>
-                  </div>
-                  <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold"
-                       :style="{ backgroundColor: getUserColor(payment.toUserId) }">
-                    {{ payment.to.name.charAt(0).toUpperCase() }}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Mobile Layout -->
-              <div class="sm:hidden flex flex-col p-3 bg-meal-light">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-2"
-                         :style="{ backgroundColor: getUserColor(payment.fromUserId) }">
-                      {{ payment.from.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div>
-                      <p class="font-bold text-meal-gray-dark text-sm">{{ payment.from.name }}</p>
-                      <p class="text-xs text-meal-gray">zahlt an</p>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center">
-                    <div>
-                      <p class="font-bold text-meal-gray-dark text-sm text-right">{{ payment.to.name }}</p>
-                      <p class="text-xs text-meal-gray text-right">erhält</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ml-2"
-                         :style="{ backgroundColor: getUserColor(payment.toUserId) }">
-                      {{ payment.to.name.charAt(0).toUpperCase() }}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="font-bold text-xl text-meal-error text-center mb-2">
-                  {{ formatCurrency(payment.amount) }}
-                </div>
-              </div>
-
-              <div class="p-4 border-t border-meal-gray-light">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                  <button
-                      @click="markOptimizedAsPaid(index)"
-                      class="bg-meal-primary hover:bg-meal-dark text-white px-4 py-2 rounded transition-colors duration-200 w-full sm:w-auto text-sm sm:text-base"
-                  >
-                    Als bezahlt markieren
-                  </button>
-
-                  <div class="flex items-center text-sm text-meal-gray-dark">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Diese Zahlung löst {{ payment.resolvesCount }} Beträge gleichzeitig</span>
-                  </div>
-                </div>
-              </div>
+            <div class="flex items-center bg-meal-gray-light p-1 px-2 rounded">
+              <div class="w-3 h-3 bg-meal-gray-light border border-meal-gray rounded-full mr-1"></div>
+              <span class="font-medium">Keine Verbindung</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Zahlungen Historie -->
-      <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-        <h2 class="text-xl sm:text-2xl font-header font-bold text-meal-gray-dark mb-4 sm:mb-6">Letzte Zahlungen</h2>
-
-        <div v-if="recentPayments.length === 0" class="text-center py-6 sm:py-8 text-meal-gray">
-          <p>Noch keine Zahlungen erfasst.</p>
-        </div>
-
-        <div v-else class="space-y-3 sm:space-y-4">
-          <!-- Desktop Payment History -->
-          <div v-for="payment in recentPayments" :key="payment.id"
-               class="hidden sm:flex items-center justify-between p-3 border-b border-meal-gray-light">
-            <div class="flex items-center">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-3"
-                   :style="{ backgroundColor: getUserColor(payment.fromUserId) }">
-                {{ payment.from.name.charAt(0).toUpperCase() }}
-              </div>
-              <div>
-                <span class="font-bold">{{ payment.from.name }}</span>
-                <span class="mx-2">→</span>
-                <span class="font-bold">{{ payment.to.name }}</span>
-                <p class="text-sm text-meal-gray">{{ formatDate(payment.date) }}</p>
-              </div>
-            </div>
-            <div class="flex items-center">
-              <span class="font-bold text-meal-positive mr-2">{{ formatCurrency(payment.amount) }}</span>
-              <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-meal-positive text-white"
-              >
-                Bezahlt
-              </span>
-            </div>
-          </div>
-
-          <!-- Mobile Payment History -->
-          <div v-for="payment in recentPayments" :key="payment.id"
-               class="flex sm:hidden flex-col p-3 border-b border-meal-gray-light">
-            <div class="flex items-center mb-2">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2"
-                   :style="{ backgroundColor: getUserColor(payment.fromUserId) }">
-                {{ payment.from.name.charAt(0).toUpperCase() }}
-              </div>
-              <div>
-                <div class="flex items-center">
-                  <span class="font-medium text-sm">{{ payment.from.name }}</span>
-                  <span class="mx-1 text-meal-gray">→</span>
-                  <span class="font-medium text-sm">{{ payment.to.name }}</span>
-                </div>
-                <p class="text-xs text-meal-gray">{{ formatDate(payment.date) }}</p>
-              </div>
-            </div>
-            <div class="flex items-center justify-end">
-              <span class="font-bold text-meal-positive mr-2 text-sm">{{ formatCurrency(payment.amount) }}</span>
-              <span
-                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-meal-positive text-white"
-              >
-                Bezahlt
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Zahlungen Historie (ausgelagerte Komponente) -->
+      <PaymentHistory class="h-[300px] flex-shrink-0 overflow-auto" ref="paymentHistoryRef"/>
+      
+      <!-- Schulddetails Modal -->
+      <Modal v-if="showDetailsModal" 
+             :show="showDetailsModal" 
+             :title="'Details für Betrag zwischen ' + (selectedDebt ? selectedDebt.from.name : '') + ' und ' + (selectedDebt ? selectedDebt.to.name : '')"
+             @close="closeDetailsModal">
+        <DebtDetails 
+          v-if="selectedDebt" 
+          :from-user-id="selectedDebt.fromUserId" 
+          :to-user-id="selectedDebt.toUserId" />
+      </Modal>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import router from "../router";
-import {mutation, query} from "../graphql.ts";
-import {create, get} from "axios";
+import {computed, onMounted, ref} from "vue";
+import {type Debt, mutation, type PaymentInput, query, type User} from "../graphql.ts";
+import PaymentHistory from "../components/PaymentHistory.vue";
+import StatCard from "../components/StatCard.vue";
+import Modal from "../components/Modal.vue";
+import DebtDetails from "../components/DebtDetails.vue";
 
-// Beispiel-Benutzer
-const users = ref([]);
+// Ref für die PaymentHistory-Komponente
+const paymentHistoryRef = ref();
 
-// Beispiel-Beträge (in der Realität berechnet aus Mahlzeiten und Zahlungen)
-const debts = ref([]);
-
-// Beispiel-Zahlungshistorie
-const recentPayments = ref([]);
-
-
-async function getUsers() {
-  const [data, err] = await query.getUsers();
-  if (err) {
-    console.error('Error getting users:', err);
-    return;
-  }
-  users.value = data;
+// Zusätzliche Typen
+interface DebtView extends Omit<Debt, 'amount'> {
+  amount: number;
+  meals: number;
+  from: {
+    id: number;
+    name: string;
+  };
+  to: {
+    id: number;
+    name: string;
+  };
 }
 
-async function getDebts() {
-  const [data, err] = await query.getDebts();
-  if (err) {
-    console.error('Error getting debts:', err);
-    return;
-  }
-
-  // Transform debts to include user objects
-  debts.value = data.map(debt => {
-    const fromUser = users.value.find(user => user.id === debt.fromUserId);
-    const toUser = users.value.find(user => user.id === debt.toUserId);
-
-    return {
-      ...debt,
-      amount: parseFloat(debt.amount),
-      meals: debt.mealsCount,
-      from: {
-        id: fromUser?.id,
-        name: fromUser?.name
-      },
-      to: {
-        id: toUser?.id,
-        name: toUser?.name
-      }
-    };
-  });
+interface GroupedDebt {
+  fromUserId: number;
+  toUserId: number;
+  from: {
+    id: number;
+    name: string;
+  };
+  to: {
+    id: number;
+    name: string;
+  };
+  amount: number;
+  meals: number;
+  count: number;
+  resolvesCount?: number;
 }
 
-async function getRecentPayments() {
-  const [data, err] = await query.getPayments();
-  if (err) {
-    console.error('Error getting payments:', err);
-    return;
-  }
-
-  // Transform payments to include user objects
-  recentPayments.value = data.map(payment => {
-    const fromUser = users.value.find(user => user.id === payment.fromUserId);
-    const toUser = users.value.find(user => user.id === payment.toUserId);
-
-    return {
-      ...payment,
-      amount: parseFloat(payment.amount),
-      from: {
-        id: fromUser?.id,
-        name: fromUser?.name
-      },
-      to: {
-        id: toUser?.id,
-        name: toUser?.name
-      }
-    };
-  });
+interface PaymentSummary {
+  from: string;
+  to: string;
+  amount: number;
+  date: string;
 }
-// UI Status
+
+// Anwendungsdaten
+const users = ref<User[]>([]);
+const debts = ref<DebtView[]>([]);
 const activeTab = ref('list');
+const currentUser = ref<User | null>(null);
 
-// Farben für Benutzer-Avatare
+// Modal State
+const showDetailsModal = ref(false);
+const selectedDebt = ref<DebtView | null>(null);
+
+// Statische Daten
 const avatarColors = [
   '#2E7D32', '#00796B', '#0277BD', '#1565C0', '#4527A0',
   '#6A1B9A', '#AD1457', '#C62828', '#EF6C00', '#FF8F00'
 ];
 
+
+async function getCurrentUser(): Promise<User | null> {
+  const [data, err] = await query.getCurrentUser();
+  if (err || !data) {
+    console.error('Error getting current user:', err);
+    return null;
+  }
+
+  currentUser.value = data;
+  return data;
+}
+
+// Details Modal Funktionen
+function showDebtDetails(debt: DebtView): void {
+  selectedDebt.value = debt;
+  showDetailsModal.value = true;
+}
+
+function closeDetailsModal(): void {
+  showDetailsModal.value = false;
+  selectedDebt.value = null;
+}
+
 // Berechnete Eigenschaften
-const totalDebt = computed(() => {
+const totalDebt = computed((): number => {
   return debts.value.reduce((sum, debt) => sum + debt.amount, 0);
 });
 
-const lastPayment = computed(() => {
-  if (recentPayments.value.length === 0) {
-    return { from: 'Niemand', to: 'Niemand', amount: 0, date: new Date().toISOString() };
-  }
-  return {
-    from: recentPayments.value[0].from.name,
-    to: recentPayments.value[0].to.name,
-    amount: recentPayments.value[0].amount,
-    date: recentPayments.value[0].date
-  };
+const lastPayment = computed((): PaymentSummary => {
+  return {from: 'Niemand', to: 'Niemand', amount: 0, date: new Date().toISOString()};
 });
-const optimizedPayments = computed(() => {
+
+const optimizedPayments = computed((): GroupedDebt[] => {
   if (users.value.length === 0 || debts.value.length === 0) {
     return [];
   }
 
   // Gruppiere Beträge nach Schuldner-Gläubiger-Paar
-  const groupedDebts = {};
+  const groupedDebts: Record<string, GroupedDebt> = {};
 
   debts.value.forEach(debt => {
     const key = `${debt.fromUserId}-${debt.toUserId}`;
@@ -634,8 +522,8 @@ const optimizedPayments = computed(() => {
       groupedDebts[key] = {
         fromUserId: debt.fromUserId,
         toUserId: debt.toUserId,
-        from: { ...debt.from },
-        to: { ...debt.to },
+        from: debt.from,
+        to: debt.to,
         amount: 0,
         meals: 0,
         count: 0
@@ -658,84 +546,105 @@ const optimizedPayments = computed(() => {
   return results;
 });
 
-// Methoden
-function formatCurrency(value) {
+// Daten laden
+async function loadData(): Promise<void> {
+  await getUsers();
+  await getDebts();
+  await getCurrentUser()
+}
+
+async function getUsers(): Promise<void> {
+  const [data, err] = await query.getUsers();
+  if (err || !data) {
+    console.error('Error getting users:', err);
+    return;
+  }
+  users.value = data;
+}
+
+async function getDebts(): Promise<void> {
+  const [data, err] = await query.getDebts();
+  if (err || !data) {
+    console.error('Error getting debts:', err);
+    return;
+  }
+
+  // Transform debts to include user objects
+  debts.value = (data || []).map(debt => {
+    const fromUser = users.value.find(user => user.id === debt.fromUserId);
+    const toUser = users.value.find(user => user.id === debt.toUserId);
+
+    return {
+      ...debt,
+      amount: parseFloat(debt.amount), // String zu Zahl konvertieren
+      meals: debt.mealsCount,
+      from: {
+        id: fromUser?.id || 0,
+        name: fromUser?.name || 'Unbekannt'
+      },
+      to: {
+        id: toUser?.id || 0,
+        name: toUser?.name || 'Unbekannt'
+      }
+    };
+  });
+}
+
+// Helferfunktionen
+function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR'
   }).format(value);
 }
 
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('de-DE');
 }
 
-function getUserColor(userId) {
+function getUserColor(userId: number): string {
   return avatarColors[userId % avatarColors.length];
 }
 
-async function markAsPaid(index) {
+// Aktionsfunktionen
+async function markAsPaid(index: number): Promise<void> {
   const debt = debts.value[index];
-  let payment = {
-    fromUserId: debt.from.id,
-    toUserId: debt.to.id,
-    amount: debt.amount,
-    description: `Bezahlungen für` + debt.meals
-  }
+  const payment: PaymentInput = {
+    fromUserId: debt.fromUserId,
+    toUserId: debt.toUserId,
+    amount: debt.amount.toString(), // Zahl zurück zu String konvertieren für API
+    description: `Bezahlungen für ${debt.meals} Mahlzeiten`
+  };
+
   const [data, err] = await mutation.createPayment(payment);
   if (err) {
-    console.error('Error getting debts:', err);
+    console.error('Fehler beim Erstellen der Zahlung:', err);
     return;
   }
-  reloadPage();
-}
+  await loadData();
 
-
-function markOptimizedAsPaid(index) {
-  // Ähnlich wie markAsPaid, aber für optimierte Zahlungen
-  const payment = optimizedPayments.value[index];
-
-  // Füge eine neue Zahlung zur Historie hinzu
-  recentPayments.value.unshift({
-    id: recentPayments.value.length + 1,
-    from: payment.from,
-    to: payment.to,
-    amount: payment.amount,
-    date: new Date().toISOString().split('T')[0]
-  });
-
-  // Aktualisiere Beträge - in Realität würde man hier alle betroffenen Beträge aktualisieren
-  // Diese einfache Implementierung entfernt einfach die erste passende Schuld
-  const debtIndex = debts.value.findIndex(
-      debt => debt.fromUserId === payment.fromUserId && debt.toUserId === payment.toUserId
-  );
-
-  if (debtIndex >= 0) {
-    const debt = debts.value[debtIndex];
-    if (debt.amount <= payment.amount) {
-      debts.value.splice(debtIndex, 1);
-    } else {
-      debt.amount -= payment.amount;
-    }
+  // Zahlungshistorie aktualisieren
+  if (paymentHistoryRef.value) {
+    await paymentHistoryRef.value.refreshPayments();
   }
 }
 
-function getDebtAmount(fromId, toId) {
+function getDebtAmount(fromId: number, toId: number): number {
   const debt = debts.value.find(d => d.fromUserId === fromId && d.toUserId === toId);
   return debt ? debt.amount : 0;
 }
 
-function getUserBalance(userId) {
+function getUserBalance(userId: number): number {
   let balance = 0;
 
-  // Beträge (negativ)
+  // Negative Beträge (was der User schuldet)
   debts.value.forEach(debt => {
     if (debt.fromUserId === userId) {
       balance -= debt.amount;
     }
   });
 
-  // Forderungen (positiv)
+  // Positive Beträge (was der User bekommt)
   debts.value.forEach(debt => {
     if (debt.toUserId === userId) {
       balance += debt.amount;
@@ -745,18 +654,8 @@ function getUserBalance(userId) {
   return balance;
 }
 
-function goBackToHomeScreen() {
-  router.push('/homefeed');
-}
-
-async function reloadPage() {
-  await getUsers();
-  await getDebts();
-  await getRecentPayments();
-}
-// Beim Laden der Komponente
+// Initialisierung
 onMounted(() => {
-  reloadPage();
+  loadData();
 });
-
 </script>

@@ -7,13 +7,16 @@ package graph
 import (
 	"context"
 	"my-backend/graph/model"
-
-	"github.com/99designs/gqlgen/graphql"
 )
 
-// UploadReceipt is the resolver for the uploadReceipt field.
-func (r *mutationResolver) UploadReceipt(ctx context.Context, file graphql.Upload) (*model.ReceiptResult, error) {
-	return GetControllerService(ctx).UploadReceipt(file)
+// EditUser is the resolver for the editUser field.
+func (r *mutationResolver) EditUser(ctx context.Context, user model.UserInput) (*model.Response, error) {
+	return GetControllerService(ctx).EditUser(user)
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*model.Response, error) {
+	return GetControllerService(ctx).DeleteUser(id)
 }
 
 // CreatePost is the resolver for the createPost field.
@@ -34,6 +37,16 @@ func (r *mutationResolver) CreateMeal(ctx context.Context, meal model.MealInput)
 // CreatePayment is the resolver for the createPayment field.
 func (r *mutationResolver) CreatePayment(ctx context.Context, payment model.PaymentInput) (*model.Response, error) {
 	return GetControllerService(ctx).CreatePayment(payment)
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (*model.Response, error) {
+	return GetControllerService(ctx).Logout()
+}
+
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, user model.UpdateUserInput) (*model.Response, error) {
+	return GetControllerService(ctx).UpdateUser(user)
 }
 
 // GetUsers is the resolver for the getUsers field.
@@ -66,6 +79,26 @@ func (r *queryResolver) GetDashboard(ctx context.Context) (*model.Dashboard, err
 	return GetControllerService(ctx).GetDashboard()
 }
 
+// GetCurrentUser is the resolver for the getCurrentUser field.
+func (r *queryResolver) GetCurrentUser(ctx context.Context) (*model.User, error) {
+	return GetControllerService(ctx).GetCurrentUser()
+}
+
+// GetMealByID is the resolver for the getMealById field.
+func (r *queryResolver) GetMealByID(ctx context.Context, id int) (*model.Meal, error) {
+	return GetControllerService(ctx).GetMealByID(id)
+}
+
+// GetMealsForCurrentUser is the resolver for the getMealsForCurrentUser field.
+func (r *queryResolver) GetMealsForCurrentUser(ctx context.Context) ([]*model.Meal, error) {
+	return GetControllerService(ctx).GetMealsForCurrentUser()
+}
+
+// GetDebtDetails is the resolver for the getDebtDetails field.
+func (r *queryResolver) GetDebtDetails(ctx context.Context, fromUserID int, toUserID int) ([]*model.DebtDetail, error) {
+	return GetControllerService(ctx).GetDebtDetails(fromUserID, toUserID)
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -74,3 +107,15 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) DebtDetails(ctx context.Context, fromUserID int, toUserID int) ([]*model.DebtDetail, error) {
+	panic(fmt.Errorf("not implemented: DebtDetails - debtDetails"))
+}
+*/

@@ -191,22 +191,47 @@ import { ref, onMounted } from 'vue';
 import ProductList from './ProductList.vue';
 import { mutation } from '../../graphql';
 
+// Typ-Definitionen
+interface Product {
+  name: string;
+  price: number | string;
+  isSpecific?: boolean;
+  specificParticipants?: number[];
+  showParticipants?: boolean;
+}
+
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Meal {
+  id: number;
+  name: string;
+  date: string;
+  totalAmount: number | string;
+  userId: number;
+  description?: string;
+  participants: number[];
+  productsData?: Product[];
+}
+
 const props = defineProps({
   meal: {
-    type: Object,
+    type: Object as () => Meal,
     required: true
   },
   users: {
-    type: Array,
+    type: Array as () => User[],
     required: true
   }
 });
 
 const emit = defineEmits(['close', 'update']);
-const selectedFile = ref(null);
+const selectedFile = ref<File | null>(null);
 
 // Create a deep copy of the meal to edit
-const editedMeal = ref({...props.meal});
+const editedMeal = ref<Meal>({...props.meal});
 
 // Initialize editedMeal with the correct data structure
 onMounted(() => {
@@ -219,11 +244,14 @@ onMounted(() => {
   editedMeal.value.participants = [...props.meal.participants];
 });
 
-function handleFileChange(e) {
-  selectedFile.value = e.target.files[0];
+function handleFileChange(e: Event): void {
+  const input = e.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    selectedFile.value = input.files[0];
+  }
 }
 
-async function uploadReceipt() {
+async function uploadReceipt(): Promise<void> {
   if (!selectedFile.value) return;
 
   try {
@@ -239,7 +267,7 @@ async function uploadReceipt() {
   }
 }
 
-function toggleParticipant(userId) {
+function toggleParticipant(userId: number): void {
   const index = editedMeal.value.participants.indexOf(userId);
   if (index === -1) {
     editedMeal.value.participants.push(userId);
@@ -248,11 +276,11 @@ function toggleParticipant(userId) {
   }
 }
 
-function isParticipant(userId) {
+function isParticipant(userId: number): boolean {
   return editedMeal.value.participants.includes(userId);
 }
 
-function addProduct() {
+function addProduct(): void {
   if (!editedMeal.value.productsData) {
     editedMeal.value.productsData = [];
   }
@@ -266,7 +294,7 @@ function addProduct() {
   });
 }
 
-function updateMeal() {
+function updateMeal(): void {
   if (editedMeal.value.participants.length === 0) return;
 
   emit('update', editedMeal.value);

@@ -338,8 +338,8 @@ const onClickLogin = () => {
 
   const formData = new URLSearchParams();
 
-  formData.append('email', inputEmail.value);
-  formData.append('password', inputPassword.value);
+  formData.append('email', inputEmail.value.toLowerCase());
+  formData.append('password', inputPassword.value.toLowerCase());
   axios.post('/api/login', formData, { withCredentials: true })
       .then(response => {
         errorMessage.value = "";

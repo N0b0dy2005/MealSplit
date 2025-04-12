@@ -122,13 +122,38 @@
 </template>
 
 <script setup lang="ts">
+// Typ-Definitionen
+interface Product {
+  name: string;
+  price: number | string;
+  isSpecific?: boolean;
+  specificParticipants?: number[];
+  showParticipants?: boolean;
+}
+
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Meal {
+  id: number;
+  name: string;
+  date: string;
+  totalAmount: number;
+  userId: number;
+  description?: string;
+  participants: number[];
+  productsData?: Product[];
+}
+
 const props = defineProps({
   meal: {
-    type: Object,
+    type: Object as () => Meal,
     required: true
   },
   users: {
-    type: Array,
+    type: Array as () => User[],
     required: true
   }
 });
@@ -141,33 +166,34 @@ const avatarColors = [
   '#6A1B9A', '#AD1457', '#C62828', '#EF6C00', '#FF8F00'
 ];
 
-function formatCurrency(value) {
+function formatCurrency(value: number | string): string {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR'
-  }).format(value);
+  }).format(numValue);
 }
 
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('de-DE');
 }
 
-function getUserName(userId) {
+function getUserName(userId: number): string {
   const user = props.users.find(u => u.id === userId);
   return user ? user.name : 'Unbekannt';
 }
 
-function getUserInitial(userId) {
+function getUserInitial(userId: number): string {
   const user = props.users.find(u => u.id === userId);
   return user ? user.name.charAt(0).toUpperCase() : '?';
 }
 
-function getUserColor(userId) {
+function getUserColor(userId: number): string {
   return avatarColors[userId % avatarColors.length];
 }
 
 // Calculate costs per participant based on products
-function calculateParticipantCost(meal, participantId) {
+function calculateParticipantCost(meal: Meal, participantId: number): number {
   if (!meal.productsData || meal.productsData.length === 0) {
     // If no products, divide total amount equally
     return meal.totalAmount / meal.participants.length;
@@ -178,10 +204,10 @@ function calculateParticipantCost(meal, participantId) {
   for (const product of meal.productsData) {
     if (!product.isSpecific) {
       // Product for all participants - divide equally
-      totalCost += parseFloat(product.price) / meal.participants.length;
-    } else if (product.specificParticipants.includes(participantId)) {
+      totalCost += parseFloat(product.price as string) / meal.participants.length;
+    } else if (product.specificParticipants?.includes(participantId)) {
       // Product only for specific participants - divide among them
-      totalCost += parseFloat(product.price) / product.specificParticipants.length;
+      totalCost += parseFloat(product.price as string) / (product.specificParticipants?.length || 1);
     }
   }
 

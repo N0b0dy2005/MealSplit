@@ -1,105 +1,51 @@
 <template>
   <div class="min-h-screen flex flex-col flex-grow bg-meal-light font-sans pb-8">
-    <!-- Header -->
-    <header class="bg-meal-primary text-white p-4 shadow-md mb-4 sm:mb-8">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-          </svg>
-          <h1 class="text-xl sm:text-2xl font-header font-bold">Dashboard</h1>
-        </div>
-        <button @click="goBackToHomeScreen"
-                class="text-white hover:text-meal-accent-light transition-colors duration-200 text-sm sm:text-base flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-          </svg>
-          <span class="hidden xs:inline">Zurück zur Startseite</span>
-          <span class="xs:hidden">Zurück</span>
-        </button>
-      </div>
-    </header>
-
-    <div class="container mx-auto px-2 sm:px-4">
+    <div class="container mx-auto px-2 sm:px-4 mt-4 sm:mt-8">
       <!-- Übersichtskarten -->
       <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
-        <div class="bg-white rounded-xl shadow-meal p-3 sm:p-6">
-          <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Mahlzeiten</h3>
-            <div class="p-1 sm:p-2 bg-meal-light rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-meal-primary" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-              </svg>
-            </div>
-          </div>
-          <p class="text-xl sm:text-3xl font-bold text-meal-gray-dark mb-1">{{ stats.meals }}</p>
-          <div class="flex items-center text-xs sm:text-sm">
-            <span :class="stats.mealsChange >= 0 ? 'text-meal-positive' : 'text-meal-error'" class="font-medium">
-              {{ stats.mealsChange >= 0 ? '+' : '' }}{{ stats.mealsChange }}%
-            </span>
-            <span class="text-meal-gray ml-1">seit letztem Monat</span>
-          </div>
-        </div>
+        <StatCard 
+          title="Mahlzeiten" 
+          :value="stats.meals" 
+          :change-value="stats.mealsChange" 
+          caption="seit letztem Monat"
+          show-icon
+          icon-color="text-meal-primary"
+          iconPath="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+        />
 
-        <div class="bg-white rounded-xl shadow-meal p-3 sm:p-6">
-          <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Ausgaben</h3>
-            <div class="p-1 sm:p-2 bg-meal-light rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-meal-accent" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-          </div>
-          <p class="text-xl sm:text-3xl font-bold text-meal-gray-dark mb-1">{{ formatCurrency(stats.totalSpent) }}</p>
-          <div class="flex items-center text-xs sm:text-sm">
-            <span :class="stats.spentChange >= 0 ? 'text-meal-positive' : 'text-meal-error'" class="font-medium">
-              {{ stats.spentChange >= 0 ? '+' : '' }}{{ stats.spentChange }}%
-            </span>
-            <span class="text-meal-gray ml-1">seit letztem Monat</span>
-          </div>
-        </div>
+        <StatCard 
+          title="Ausgaben" 
+          :value="stats.totalSpent" 
+          :change-value="stats.spentChange" 
+          caption="seit letztem Monat"
+          is-currency
+          show-icon
+          icon-color="text-meal-accent"
+          iconPath="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
 
-        <div class="bg-white rounded-xl shadow-meal p-3 sm:p-6">
-          <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Benutzer</h3>
-            <div class="p-1 sm:p-2 bg-meal-light rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-meal-secondary" fill="none"
-                   viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-              </svg>
-            </div>
-          </div>
-          <p class="text-xl sm:text-3xl font-bold text-meal-gray-dark mb-1">{{ stats.users }}</p>
-          <div class="flex items-center text-xs sm:text-sm">
-            <span class="text-meal-positive font-medium">Aktiv</span>
-            <span class="text-meal-gray ml-1">in diesem Monat</span>
-          </div>
-        </div>
+        <StatCard 
+          title="Benutzer" 
+          :value="stats.users" 
+          caption="Aktiv in diesem Monat"
+          :show-change-indicator="false"
+          show-icon
+          icon-color="text-meal-secondary"
+          iconPath="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+        />
 
-        <div class="bg-white rounded-xl shadow-meal p-3 sm:p-6">
-          <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-lg font-header font-bold text-meal-gray-dark">Offene Beträge</h3>
-            <div class="p-1 sm:p-2 bg-meal-light rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-meal-error" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-              </svg>
-            </div>
-          </div>
-          <p class="text-xl sm:text-3xl font-bold text-meal-gray-dark mb-1">{{ formatCurrency(stats.totalDebt) }}</p>
-          <div class="flex items-center text-xs sm:text-sm">
-            <span class="text-meal-error font-medium">{{ stats.activeDebts }}</span>
-            <span class="text-meal-gray ml-1">aktive Beträge</span>
-          </div>
-        </div>
+        <StatCard 
+          title="Offene Beträge" 
+          :value="stats.totalDebt" 
+          caption="aktive Beträge"
+          :change-value="stats.activeDebts"
+          :change-is-percentage="false"
+          :show-change-indicator="false"
+          is-currency
+          show-icon
+          icon-color="text-meal-error"
+          iconPath="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+        />
       </div>
 
       <!-- Diagramme -->
@@ -107,39 +53,16 @@
         <!-- Ausgaben pro Monat -->
         <TransactionGraph :transactions="transactions" :users="users"/>
 
-        <!-- Ausgaben pro Person -->
-        <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-3 sm:mb-4">Ausgaben pro Person</h3>
-          <div class="min-h-60 sm:h-80 flex flex-col sm:flex-row items-center justify-center">
-            <!-- Kreisdiagramm mit CSS -->
-            <div class="relative w-52 h-52 sm:w-64 sm:h-64 mb-4 sm:mb-0">
-              <div class="absolute inset-0 rounded-full overflow-hidden">
-                <div v-for="(segment, index) in userExpenseSegments" :key="index"
-                     class="absolute"
-                     :style="{
-                       backgroundColor: getUserColor(segment.userId),
-                       top: 0,
-                       left: 0,
-                       width: '100%',
-                       height: '100%',
-                       clipPath: `polygon(50% 50%, ${segment.startX}% ${segment.startY}%, ${segment.endX}% ${segment.endY}%, ${segment.extraPoints})`,
-                     }">
-                </div>
-              </div>
-              <!-- Mittleres Loch im Kreis -->
-              <div
-                  class="absolute w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-            </div>
-
-            <!-- Legende -->
-            <div class="sm:ml-6 space-y-1 sm:space-y-2 grid grid-cols-2 sm:block gap-1">
-              <div v-for="user in userExpenseData" :key="user.id" class="flex items-center">
-                <div class="w-3 h-3 sm:w-4 sm:h-4 rounded mr-1 sm:mr-2" :style="{ backgroundColor: getUserColor(user.id) }"></div>
-                <span class="text-xs sm:text-sm text-meal-gray-dark whitespace-nowrap">{{ user.name }} ({{
-                    formatPercentage(user.percentage)
-                  }})</span>
-              </div>
-            </div>
+        <!-- Umschaltbares Diagramm mit Tabs -->
+        <div class="bg-white rounded-xl shadow-meal p-4 sm:p-6 h-full flex flex-col">
+          <!-- Mahlzeiten-Diagramm ohne Tabs -->
+          <div  class="chart-container flex-grow py-2" style="min-height: 380px;">
+            <MealsPieChart 
+              :user-expense-data="userExpenseData" 
+              :get-user-color="getUserColor" 
+              :format-percentage="formatPercentage"
+              class="h-full" 
+            />
           </div>
         </div>
       </div>
@@ -147,14 +70,18 @@
       <!-- Aktuelle Aktivitäten und Beträge -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-8">
         <!-- Letzte Aktivitäten -->
-        <div class="bg-white h-[350px] sm:h-[550px] flex flex-col overflow-auto rounded-xl shadow-meal p-4 sm:p-6 lg:col-span-2">
-          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-3 sm:mb-4">Letzte Aktivitäten</h3>
+        <div
+            class="bg-white h-[350px] sm:h-[550px] flex flex-col overflow-auto rounded-xl shadow-meal p-4 sm:p-6 lg:col-span-2">
+          <h3 class="text-base sm:text-lg font-header font-bold text-meal-gray-dark mb-3 sm:mb-4">Letzte
+            Aktivitäten</h3>
 
           <div class="space-y-3 sm:space-y-4">
-            <div v-for="(activity, index) in recentActivities.slice(0, showAll ? recentActivities.length : 10)" :key="index"
+            <div v-for="(activity, index) in recentActivities.slice(0, showAll ? recentActivities.length : 10)"
+                 :key="index"
                  class="flex items-start p-2 sm:p-3 hover:bg-meal-light rounded-lg transition-colors duration-150">
               <div :class="`bg-${getActivityIconBg(activity.type)} p-1 sm:p-2 rounded-lg mr-2 sm:mr-4`">
-                <svg v-if="activity.type === 'meal'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white"
+                <svg v-if="activity.type === 'meal'" xmlns="http://www.w3.org/2000/svg"
+                     class="h-4 w-4 sm:h-6 sm:w-6 text-white"
                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
@@ -181,8 +108,9 @@
                 <!-- Spezifische Darstellung je nach Typ -->
                 <div v-if="activity.type === 'payment'" class="mt-1 flex items-center flex-wrap text-xs sm:text-sm">
                   <div class="flex items-center mr-2">
-                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
-                         :style="{ backgroundColor: getUserColor(activity.fromUserId) }">
+                    <div
+                        class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
+                        :style="{ backgroundColor: getUserColor(activity.fromUserId) }">
                       {{ getUserName(activity.fromUserId).charAt(0).toUpperCase() }}
                     </div>
                     <span>{{ getUserName(activity.fromUserId) }}</span>
@@ -192,8 +120,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                   </svg>
                   <div class="flex items-center">
-                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
-                         :style="{ backgroundColor: getUserColor(activity.toUserId) }">
+                    <div
+                        class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
+                        :style="{ backgroundColor: getUserColor(activity.toUserId) }">
                       {{ getUserName(activity.toUserId).charAt(0).toUpperCase() }}
                     </div>
                     <span>{{ getUserName(activity.toUserId) }}</span>
@@ -205,8 +134,9 @@
 
                 <div v-if="activity.type === 'meal'" class="mt-1 flex items-center flex-wrap text-xs sm:text-sm">
                   <div class="flex items-center">
-                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
-                         :style="{ backgroundColor: getUserColor(activity.userId) }">
+                    <div
+                        class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-white font-bold mr-1"
+                        :style="{ backgroundColor: getUserColor(activity.userId) }">
                       {{ getUserName(activity.userId).charAt(0).toUpperCase() }}
                     </div>
                     <span>{{ getUserName(activity.userId) }} hat bezahlt</span>
@@ -219,10 +149,12 @@
             </div>
           </div>
 
+          <!--
           <button @click="showMoreActivities"
                   class="w-full mt-3 sm:mt-4 py-2 text-meal-primary hover:text-meal-dark text-sm sm:text-base font-medium transition-colors duration-200">
             Weitere Aktivitäten anzeigen
           </button>
+          -->
         </div>
 
         <!-- Top Beträge -->
@@ -233,14 +165,17 @@
             <div v-for="(debt, index) in topDebts" :key="index"
                  class="flex items-center justify-between p-2 sm:p-3 border-b border-meal-gray-light">
               <div class="flex items-center">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold mr-2 sm:mr-3"
-                     :style="{ backgroundColor: getUserColor(debt.fromId) }">
+                <div
+                    class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold mr-2 sm:mr-3"
+                    :style="{ backgroundColor: getUserColor(debt.fromId) }">
                   {{ debt.fromName.charAt(0).toUpperCase() }}
                 </div>
                 <span class="text-xs sm:text-sm">schuldet</span>
               </div>
               <div class="flex items-center">
-                <span class="font-bold text-xs sm:text-sm text-meal-error mr-2 sm:mr-3">{{ formatCurrency(debt.amount) }}</span>
+                <span class="font-bold text-xs sm:text-sm text-meal-error mr-2 sm:mr-3">{{
+                    formatCurrency(debt.amount)
+                  }}</span>
                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold"
                      :style="{ backgroundColor: getUserColor(debt.toId) }">
                   {{ debt.toName.charAt(0).toUpperCase() }}
@@ -266,7 +201,8 @@
               class="flex items-center p-3 sm:p-4 rounded-lg border border-meal-gray-light hover:bg-meal-light transition-colors duration-200"
           >
             <div class="p-1 sm:p-2 bg-meal-primary rounded-full mr-2 sm:mr-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24"
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none"
+                   viewBox="0 0 24 24"
                    stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
@@ -283,7 +219,8 @@
               class="flex items-center p-3 sm:p-4 rounded-lg border border-meal-gray-light hover:bg-meal-light transition-colors duration-200"
           >
             <div class="p-1 sm:p-2 bg-meal-accent rounded-full mr-2 sm:mr-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24"
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none"
+                   viewBox="0 0 24 24"
                    stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -300,7 +237,8 @@
               class="flex items-center p-3 sm:p-4 rounded-lg border border-meal-gray-light hover:bg-meal-light transition-colors duration-200"
           >
             <div class="p-1 sm:p-2 bg-meal-secondary rounded-full mr-2 sm:mr-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24"
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none"
+                   viewBox="0 0 24 24"
                    stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -321,7 +259,11 @@
 import {computed, onMounted, ref} from "vue";
 import router from "../router";
 import TransactionGraph from "../components/TransactionGraph.vue";
+import MealsPieChart from "../components/MealsPieChart.vue";
+import StatCard from "../components/StatCard.vue";
 import {query} from "../graphql.ts";
+
+// Ausgewähltes Diagramm
 
 // Beispiel-Benutzer
 
@@ -331,6 +273,8 @@ const topDebts = ref([]);
 const userExpenseData = ref([]);
 
 const users = ref([]);
+const transactions = ref([]); // Für TransactionGraph
+const meals = ref([]); // Für die Mahlzeiten-Analyse
 
 async function getUsers() {
   const [data, err] = await query.getUsers();
@@ -341,10 +285,19 @@ async function getUsers() {
   }
 }
 
+async function getMeals() {
+  const [data, err] = await query.getMeals();
+  if (err) {
+    console.error('Error getting meals:', err);
+    return;
+  }
+  meals.value = data;
+}
+
 async function getDashboard() {
   const [data, err] = await query.getDashboard();
   if (err) {
-    console.error('Error getting users:', err);
+    console.error('Error getting dashboard:', err);
     return;
   }
   stats.value = {
@@ -357,6 +310,7 @@ async function getDashboard() {
     //activeDebts: data.activeDebts
   };
   data?.tobDebtsPerUser.forEach(debt => {
+
     let percentage = debt.amount / data?.totalDebts * 100;
 
     topDebts.value.push({
@@ -368,18 +322,40 @@ async function getDashboard() {
     });
   });
 
-  data?.totalCreditsPerUser.forEach(user => {
-    let percentage = user.amount / data?.totalCredits * 100;
+  // Berechne die Anzahl der Mahlzeiten pro Benutzer basierend auf den tatsächlichen Mahlzeit-Daten
+  const mealCountsPerUser = new Map();
+  
+  // Initialisiere die Map mit allen Benutzern
+  users.value.forEach(user => {
+    mealCountsPerUser.set(user.id, 0);
+  });
+  
+  // Zähle die Mahlzeiten pro Benutzer
+  meals.value.forEach(meal => {
+    mealCountsPerUser.set(meal.userId, (mealCountsPerUser.get(meal.userId) || 0) + 1);
+  });
+  
+  // Berechne die Gesamtzahl der Mahlzeiten
+  const totalMeals = Array.from(mealCountsPerUser.values()).reduce((sum, count) => sum + count, 0);
+  
+  // Erstelle userExpenseData mit den Mahlzeitendaten
+  userExpenseData.value = [];
+  mealCountsPerUser.forEach((mealCount, userId) => {
+    // Überspringe Benutzer ohne Mahlzeiten
+    if (mealCount === 0) return;
+    
+    // Berechne den Prozentsatz der Mahlzeiten
+    const percentage = (mealCount / totalMeals) * 100;
+    
     userExpenseData.value.push({
-      id: user.userId,
-      name: users.value.find(u => u.id === user.userId).name,
-      amount: user.amount,
+      id: userId,
+      name: users.value.find(u => u.id === userId)?.name || `User ${userId}`,
+      amount: mealCount, // Anzahl der Mahlzeiten
       percentage: percentage
     });
   });
 
-  console.log("userExpenseData",userExpenseData.value);
-
+  console.log("userExpenseData", userExpenseData.value);
 }
 
 // Statistiken
@@ -413,43 +389,58 @@ async function getActivities() {
     return;
   }
 }
-
-// Top Beträge
-
-
-// Berechnung für das Kreisdiagramm
 const userExpenseSegments = computed(() => {
   const segments = [];
   let cumulativePercentage = 0;
 
   userExpenseData.value.forEach(user => {
+    // Umrechnung der Prozentwerte in Winkel (360° entsprechen 100%)
     const startAngle = cumulativePercentage * 3.6;
     cumulativePercentage += user.percentage;
     const endAngle = cumulativePercentage * 3.6;
 
+    // Umrechnung in Radianten, Start bei -90° (oben)
     const startRad = (startAngle - 90) * Math.PI / 180;
     const endRad = (endAngle - 90) * Math.PI / 180;
 
+    // Bestimme die Start- und Endpunkte des Kreisbogens (Kreisradius 50%)
     const startX = 50 + 50 * Math.cos(startRad);
     const startY = 50 + 50 * Math.sin(startRad);
     const endX = 50 + 50 * Math.cos(endRad);
     const endY = 50 + 50 * Math.sin(endRad);
 
-    let extraPoints = '';
-    if (endAngle - startAngle > 180) {
-      const midRad = (startRad + endRad) / 2;
-      const midX = 50 + 50 * Math.cos(midRad);
-      const midY = 50 + 50 * Math.sin(midRad);
-      extraPoints = `${midX}% ${midY}%,`;
+    // Beginne das Polygon beim Mittelpunkt und dem Startpunkt
+    let clipPath = `polygon(50% 50%, ${startX}% ${startY}%`;
+
+    // Verwende einen kleineren Winkel-Schritt (z. B. 10°) für alle Segmente,
+    // um einen glatteren Bogen zu erzielen
+    const stepAngle = 10;
+    if (endAngle - startAngle > stepAngle) {
+      const steps = Math.ceil((endAngle - startAngle) / stepAngle);
+      for (let i = 1; i < steps; i++) {
+        const angle = startAngle + ((endAngle - startAngle) * (i / steps));
+        const rad = (angle - 90) * Math.PI / 180;
+        const x = 50 + 50 * Math.cos(rad);
+        const y = 50 + 50 * Math.sin(rad);
+        clipPath += `, ${x}% ${y}%`;
+      }
     }
+
+    // Füge den Endpunkt hinzu und schließe das Polygon
+    clipPath += `, ${endX}% ${endY}%)`;
+
+    // Ausgabe zum Debuggen
+    console.log(`Segment für User ${user.id} (${user.name}): `, {
+      userId: user.id,
+      percentage: user.percentage,
+      color: getUserColor(user.id),
+      clipPath
+    });
 
     segments.push({
       userId: user.id,
-      startX,
-      startY,
-      endX,
-      endY,
-      extraPoints
+      clipPath,
+      color: getUserColor(user.id)
     });
   });
 
@@ -535,7 +526,8 @@ function goToDebts() {
 onMounted(async () => {
   await getActivities();
   await getUsers();
-  await getDashboard();
+  await getMeals(); // Hole zuerst die Mahlzeiten
+  await getDashboard(); // Dann berechne das Dashboard
 });
 </script>
 
@@ -545,6 +537,7 @@ onMounted(async () => {
   .xs\:inline {
     display: inline;
   }
+
   .xs\:hidden {
     display: none;
   }

@@ -25,16 +25,23 @@
 </template>
 
 <script setup lang="ts">
+// Typ-Definition
+interface Meal {
+  id: number;
+  name: string;
+  date: string;
+}
+
 const props = defineProps({
   meal: {
-    type: Object,
+    type: Object as () => Meal,
     required: true
   }
 });
 
 defineEmits(['close', 'delete']);
 
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('de-DE');
 }
 </script>

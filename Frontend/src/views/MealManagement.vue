@@ -1,42 +1,19 @@
 <template>
   <div class="min-h-screen flex flex-col flex-grow bg-meal-light font-sans pb-8">
-    <!-- Header -->
-    <header class="bg-meal-primary text-white p-4 shadow-md mb-8">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-          <h1 class="text-2xl font-header font-bold">Mahlzeiten verwalten</h1>
-        </div>
-        <button @click="goBackToHomeScreen" class="text-white hover:text-meal-accent-light transition-colors duration-200">
-          <span class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Zurück zur Startseite
-          </span>
-        </button>
-      </div>
-    </header>
-
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 mt-4 sm:mt-8">
       <!-- Neue Mahlzeit erstellen -->
-      <MealForm
+      <MealForm class=""
           :users="users"
           :show-form="showAddForm"
           @toggle-form="showAddForm = !showAddForm"
           @save-meal="saveMeal"
       />
-
-      <!-- Filter und Suche -->
       <MealFilterBar
           v-model:search-query="searchQuery"
           v-model:filter-month="filterMonth"
           v-model:filter-year="filterYear"
           :available-years="availableYears"
       />
-
       <MealList
           :meals="filteredMeals"
           :users="users"
@@ -83,16 +60,41 @@ import MealDetailDialog from "../components/meal/MealDetailDialog.vue";
 import MealDeleteDialog from "../components/meal/MealDeleteDialog.vue";
 import MealEditDialog from "../components/meal/MealEditDialog.vue";
 
+// Typ-Definitionen
+interface Product {
+  name: string;
+  price: number;
+  isSpecific?: boolean;
+  specificParticipants?: number[];
+  showParticipants?: boolean;
+}
+
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Meal {
+  id: number;
+  name: string;
+  date: string;
+  totalAmount: number;
+  userId: number;
+  description?: string;
+  participants: number[];
+  productsData?: Product[];
+}
+
 // Data
-const users = ref([]);
-const meals = ref([]);
+const users = ref<User[]>([]);
+const meals = ref<Meal[]>([]);
 const showAddForm = ref(false);
 const searchQuery = ref('');
 const filterMonth = ref('');
 const filterYear = ref('');
-const selectedMeal = ref(null);
-const mealToDelete = ref(null);
-const editingMeal = ref(null);
+const selectedMeal = ref<Meal | null>(null);
+const mealToDelete = ref<Meal | null>(null);
+const editingMeal = ref<Meal | null>(null);
 
 // Computed properties
 const filteredMeals = computed(() => {
@@ -152,14 +154,30 @@ async function getMeals() {
   // Parse productsData from JSON string if available
   meals.value = data.map(meal => {
     try {
+      // Parse productsData
       if (meal.productsData && typeof meal.productsData === 'string') {
         meal.productsData = JSON.parse(meal.productsData);
+      } else if (meal.products && typeof meal.products === 'string') {
+        meal.productsData = JSON.parse(meal.products);
       } else if (!meal.productsData) {
         meal.productsData = [];
       }
+
+      // Ensure participants is always an array of numbers
+      if (!meal.participants) {
+        if (meal.userIds && typeof meal.userIds === 'string') {
+          meal.participants = meal.userIds.split(',').map(id => parseInt(id));
+        } else {
+          meal.participants = [];
+        }
+      }
+
+      // Log for debugging
+      console.log(`Meal ${meal.name} has ${meal.productsData.length} products and ${meal.participants.length} participants`);
     } catch (e) {
-      console.error('Error parsing productsData', e);
+      console.error('Error parsing meal data', e);
       meal.productsData = [];
+      meal.participants = [];
     }
     return meal;
   });
@@ -189,14 +207,16 @@ async function saveMeal(newMeal) {
     userId: newMeal.userId,
     userIds: participants,
     description: newMeal.description,
-   // productsData: productsDataString // Include the products data
+    produkts: productsDataString
   };
 
   console.log("Saving meal with products:", meal);
 
+
+
   const [data, err] = await mutation.createMeal(meal);
   if (err) {
-    console.error('Error creating meal:', err);
+    console.error('Error creating meal:', err,data);
     return;
   }
 
@@ -215,16 +235,64 @@ function calculateTotalAmount(products) {
 }
 
 function selectMeal(meal) {
-  selectedMeal.value = meal;
+  console.log("Mahlzeit ausgewählt:", meal);
+
+  // Create a deep copy with all necessary properties
+  const mealCopy = {
+    ...meal,
+    participants: Array.isArray(meal.participants) ? [...meal.participants] : [],
+    productsData: Array.isArray(meal.productsData) ? [...meal.productsData] : []
+  };
+
+  // Ensure participants is correctly set if only userIds exists
+  if ((!mealCopy.participants || mealCopy.participants.length === 0) && meal.userIds) {
+    try {
+      if (typeof meal.userIds === 'string') {
+        mealCopy.participants = meal.userIds.split(',').map(id => parseInt(id));
+      }
+    } catch (e) {
+      console.error('Error parsing participants', e);
+      mealCopy.participants = [];
+    }
+  }
+
+  // Ensure productsData is correctly set
+  if (!mealCopy.productsData || mealCopy.productsData.length === 0) {
+    if (meal.products && typeof meal.products === 'string') {
+      try {
+        mealCopy.productsData = JSON.parse(meal.products);
+        console.log("Parsed products for detail view:", mealCopy.productsData);
+      } catch (e) {
+        console.error('Error parsing products for detail view', e);
+        mealCopy.productsData = [];
+      }
+    }
+  }
+
+  selectedMeal.value = mealCopy;
 }
 
 function editMeal(meal) {
+  console.log("Mahlzeit bearbeiten:", meal);
+
   // Create a deep copy to avoid modifying the original
   let mealCopy = {
     ...meal,
-    participants: [...meal.participants],
+    participants: Array.isArray(meal.participants) ? [...meal.participants] : [],
     productsData: meal.productsData ? [...meal.productsData] : []
   };
+
+  // Ensure participants is correctly set if only userIds exists
+  if ((!mealCopy.participants || mealCopy.participants.length === 0) && meal.userIds) {
+    try {
+      if (typeof meal.userIds === 'string') {
+        mealCopy.participants = meal.userIds.split(',').map(id => parseInt(id));
+      }
+    } catch (e) {
+      console.error('Error parsing participants', e);
+      mealCopy.participants = [];
+    }
+  }
 
   // Ensure productsData is an array
   if (!Array.isArray(mealCopy.productsData)) {
@@ -241,7 +309,15 @@ function editMeal(meal) {
 }
 
 function confirmDelete(meal) {
-  mealToDelete.value = meal;
+  console.log("Mahlzeit löschen:", meal);
+
+  // Create a deep copy with all necessary properties
+  const mealCopy = {
+    ...meal,
+    date: meal.date || new Date().toISOString().split('T')[0]
+  };
+
+  mealToDelete.value = mealCopy;
 }
 
 async function deleteMeal() {
